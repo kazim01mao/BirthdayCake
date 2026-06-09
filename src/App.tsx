@@ -21,6 +21,7 @@ export default function App() {
 
   // Audio configuration (optional premium ambient track selection)
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const celebrationTimerRef = React.useRef<number | null>(null);
 
   useEffect(() => {
     // Parse URL queries for custom greetings
@@ -44,6 +45,9 @@ export default function App() {
     window.addEventListener('deviceorientation', updateOrientationHUD);
     return () => {
       window.removeEventListener('deviceorientation', updateOrientationHUD);
+      if (celebrationTimerRef.current !== null) {
+        window.clearTimeout(celebrationTimerRef.current);
+      }
     };
   }, []);
 
@@ -62,8 +66,12 @@ export default function App() {
 
   const handleCandleExtinguished = () => {
     setIsExtinguished(true);
-    // Automatically transition to step 3 layout adjustments
-    setStep(3);
+    if (celebrationTimerRef.current !== null) {
+      window.clearTimeout(celebrationTimerRef.current);
+    }
+    celebrationTimerRef.current = window.setTimeout(() => {
+      setStep(3);
+    }, 1600);
   };
 
   const handleReset = () => {
@@ -71,6 +79,10 @@ export default function App() {
     setPhoto(null);
     setIsExtinguished(false);
     setIsCardOpen(false);
+    if (celebrationTimerRef.current !== null) {
+      window.clearTimeout(celebrationTimerRef.current);
+      celebrationTimerRef.current = null;
+    }
     setStep(1);
   };
 
@@ -281,4 +293,3 @@ export default function App() {
     </div>
   );
 }
-

@@ -9,6 +9,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraActive, setCameraActive] = useState<boolean>(false);
@@ -24,23 +25,39 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   ];
 
   useEffect(() => {
-    startCamera();
     return () => {
       stopCamera();
     };
   }, []);
 
+  useEffect(() => {
+    if (!videoRef.current || !streamRef.current || !cameraActive) return;
+
+    videoRef.current.srcObject = streamRef.current;
+    videoRef.current.play().catch((err) => {
+      console.warn('Video preview failed to play:', err);
+      setPermissionError('相機已授權，但預覽畫面無法播放。請改用上傳/拍照。');
+      setCameraActive(false);
+    });
+  }, [cameraActive, stream]);
+
   const startCamera = async () => {
     setPermissionError(null);
     setLoading(true);
     try {
-      if (stream) {
+      if (!window.isSecureContext) {
+        throw new Error('相機需要 HTTPS 或 localhost 環境才能使用。');
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('此瀏覽器不支援 getUserMedia 相機 API。');
+      }
+      if (streamRef.current) {
         stopCamera();
       }
       
       const constraints = {
         video: {
-          facingMode: 'user',
+          facingMode: { ideal: 'user' },
           width: { ideal: 640 },
           height: { ideal: 480 }
         },
@@ -48,16 +65,13 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
       };
       
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      streamRef.current = mediaStream;
       setStream(mediaStream);
       setCameraActive(true);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
     } catch (err: any) {
       console.warn("Camera access failed or denied:", err);
       setPermissionError(
-        "無法調用攝像頭。可能是因為設備不支援、權限被拒絕，或是處在安全沙箱環境中。"
+        err?.message || "無法調用攝像頭。可能是因為設備不支援、權限被拒絕，或是處在安全沙箱環境中。"
       );
       setCameraActive(false);
     } finally {
@@ -66,8 +80,9 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   };
 
   const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
       setStream(null);
     }
     setCameraActive(false);
@@ -187,9 +202,9 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
             <Camera className="w-10 h-10 sm:w-12 sm:h-12 text-gold-300/40 animate-pulse" />
             <div className="space-y-1">
-              <p className="text-xs sm:text-sm font-medium text-gold-200">攝像頭不可用</p>
+              <p className="text-xs sm:text-sm font-medium text-gold-200">點擊下方按鈕啟動相機</p>
               <p className="text-[10px] sm:text-[11px] text-gray-500 max-w-[260px]">
-                請上傳照片或選用精美預設圖片。
+                手機瀏覽器需要由你手動點擊後才會彈出相機權限。
               </p>
             </div>
           </div>
@@ -210,6 +225,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="user"
         onChange={handleFileUpload}
         className="hidden"
       />
@@ -246,7 +262,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
                   className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl border border-pink-500/20 hover:border-pink-500/50 bg-pink-500/5 text-[10px] sm:text-xs text-pink-200 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  上傳照片
+                  上傳/拍照
                 </button>
               </div>
             )}
@@ -255,7 +271,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
             {permissionError && (
               <div className="space-y-2 sm:space-y-3">
                 <p className="text-[9px] sm:text-[10px] text-red-400/80 leading-relaxed bg-red-950/20 p-2.5 sm:p-3 rounded-lg border border-red-900/30 font-sans text-center">
-                  攝像頭無法使用，請上傳本地照片或選擇下列預設圖片：
+                  {permissionError} 請確認已使用 HTTPS 開啟網頁，或改用上傳照片：
                 </p>
                 <div className="flex justify-center gap-2 sm:gap-3 mt-1.5 sm:mt-2">
                   {presetImages.map((img, idx) => (

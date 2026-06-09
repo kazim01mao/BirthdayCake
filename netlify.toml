@@ -14,16 +14,35 @@
 
 # Configure headers for proper MIME types
 [[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+
+[[headers]]
   for = "/assets/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, immutable, max-age=31536000"
 
 [[headers]]
   for = "/assets/*.css"
   [headers.values]
     Content-Type = "text/css; charset=utf-8"
     Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, immutable, max-age=31536000"
 
 # Environment variables - must be set in Netlify dashboard
 # - VITE_GEMINI_API_KEY: Your Google Gemini API key

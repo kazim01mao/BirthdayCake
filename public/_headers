@@ -1,6 +1,10 @@
 /*
   X-Content-Type-Options: nosniff
   Access-Control-Allow-Origin: *
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
 /assets/*.js
   Content-Type: application/javascript; charset=utf-8
@@ -18,4 +22,4 @@
   Cache-Control: public, immutable, max-age=31536000
 
 /index.html
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0

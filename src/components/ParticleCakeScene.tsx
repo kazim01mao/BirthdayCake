@@ -53,17 +53,22 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   const fireworksRef = useRef<FireworkType[]>([]);
   const flatTimeRef = useRef<number>(0);
   const isTriggeredRef = useRef<boolean>(false);
-  const autoBlowCountdownRef = useRef<number>(0); // Auto-blowout countdown timer
+  const orientationRef = useRef<{ beta: number; gamma: number; isFlat: boolean }>({
+    beta: 999,
+    gamma: 999,
+    isFlat: false,
+  });
+  const controlsInteractingRef = useRef<boolean>(false);
 
   // Watch for isExtinguished state change
   useEffect(() => {
     if (isExtinguished) {
       isTriggeredRef.current = true;
       // Trigger a batch of fireworks!
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 10; i++) {
         setTimeout(() => {
           createFireworkBurst();
-        }, i * 400);
+        }, i * 260);
       }
     }
   }, [isExtinguished]);
@@ -78,8 +83,11 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     setBetaValue(Math.round(beta));
     setGammaValue(Math.round(gamma));
 
-    // Threshold: beta close to 0 (flat tilt) and gamma close to 0 (side-to-side flat)
-    const isPhoneFlat = Math.abs(beta) < 15 && Math.abs(gamma) < 15;
+    // Screen-up flat is usually beta ~= 0 and gamma ~= 0. Some mobile browsers
+    // report around 180 when screen-down, so accept that as a stable flat pose too.
+    const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
+    const isPhoneFlat = normalizedBeta < 35 && Math.abs(gamma) < 35;
+    orientationRef.current = { beta, gamma, isFlat: isPhoneFlat };
     setIsFlat(isPhoneFlat);
   };
 
@@ -247,13 +255,14 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     // Position slightly above the cake looking down elegantly
-    camera.position.set(0, 4.5, 9.5);
+    camera.position.set(0, 2.6, 7.2);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x050507, 1);
+    renderer.domElement.style.touchAction = 'none';
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -265,9 +274,25 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 + 0.1; // Limit panning too far below the table
-    controls.minDistance = 5;
-    controls.maxDistance = 18;
+    controls.enableRotate = true;
+    controls.enablePan = false;
+    controls.enableZoom = true;
+    controls.rotateSpeed = 0.9;
+    controls.zoomSpeed = 0.6;
+    controls.touches.ONE = THREE.TOUCH.ROTATE;
+    controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+    controls.target.set(0, 0.75, 0);
+    controls.minPolarAngle = Math.PI * 0.22;
+    controls.maxPolarAngle = Math.PI * 0.72;
+    controls.minDistance = 4.6;
+    controls.maxDistance = 9.5;
+    controls.addEventListener('start', () => {
+      controlsInteractingRef.current = true;
+    });
+    controls.addEventListener('end', () => {
+      controlsInteractingRef.current = false;
+    });
+    controls.update();
     controlsRef.current = controls;
 
     // 3. UnrealBloomPost-processing Configuration
@@ -313,6 +338,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     // 5. Build the Grand Luxury 3D Particle Cake Setup
     const cakeGroup = new THREE.Group();
+    cakeGroup.position.set(0, -0.25, 0);
     scene.add(cakeGroup);
     cakeGroupRef.current = cakeGroup;
 
@@ -542,9 +568,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       // Controls update
       controls.update();
 
-      // Gentle continuous rotation of the core cake system
-      if (cakeGroup) {
-        cakeGroup.rotation.y = elapsedTime * 0.15;
+      // Gentle idle rotation without fighting finger drag.
+      if (cakeGroup && !controlsInteractingRef.current && step === 2) {
+        cakeGroup.rotation.y += delta * 0.12;
       }
 
       // Slowly drift star fields in background
@@ -640,35 +666,34 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
       // Check flat sensor countdown on step 2
       if (step === 2 && !isTriggeredRef.current) {
-        if (Math.abs(betaValue) < 15 && Math.abs(gammaValue) < 15) {
+        if (orientationRef.current.isFlat) {
           // If flat orientation is established
           flatTimeRef.current += delta;
           
           // Update auto-blowout countdown
-          autoBlowCountdownRef.current = Math.max(0, 3.5 - flatTimeRef.current);
+          const remainingCountdown = Math.max(0, 2.2 - flatTimeRef.current);
           
-          const p = Math.min(1.0, flatTimeRef.current / 1.5);
+          const p = Math.min(1.0, flatTimeRef.current / 2.2);
           
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `${p * 100}%`;
           }
           if (statusLabelRef.current) {
-            const remainingTime = Math.ceil(autoBlowCountdownRef.current * 10) / 10;
+            const remainingTime = Math.ceil(remainingCountdown * 10) / 10;
             statusLabelRef.current.textContent = 
-              flatTimeRef.current >= 1.5 
+              flatTimeRef.current >= 0.5 
                 ? `即將自動熄滅... (${remainingTime}秒)`
-                : `偵測平放中... 請輕輕呼氣 (${Math.ceil((1.5 - flatTimeRef.current) * 10) / 10}秒)`;
+                : `偵測平放中...`;
           }
 
-          // Auto-blowout after being flat for 3.5 seconds
-          if (flatTimeRef.current >= 3.5) {
+          // Auto-blowout after being flat for 2.2 seconds
+          if (flatTimeRef.current >= 2.2) {
             isTriggeredRef.current = true;
             onBlowTriggered();
           }
         } else {
           // Reset flat timer
           flatTimeRef.current = 0;
-          autoBlowCountdownRef.current = 0;
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `0%`;
           }
@@ -728,6 +753,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
   // Handle forcing/simulating the blowing event (highly useful for desktops)
   const forceBlowEvent = () => {
+    if (isTriggeredRef.current) return;
     isTriggeredRef.current = true;
     onBlowTriggered();
   };
@@ -737,14 +763,14 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       {/* 3D WebGL Canvas Layer */}
       <div 
         ref={containerRef} 
-        className={`w-full h-full transition-all duration-1000 ${
+        className={`w-full h-full touch-none transition-all duration-1000 ${
           step === 3 && isExtinguished ? 'filter brightness-90 animate-pulse-slow' : ''
         }`} 
       />
 
       {/* Interactive Sensor Overlay Container for Step 2 - Mobile optimized */}
       {step === 2 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-3 sm:px-4 z-20 pointer-events-auto">
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-full max-w-sm px-3 sm:px-4 z-20 pointer-events-auto">
           <div className="glass-morphism rounded-2xl p-3 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
             
             {/* Visual Tilt Sensors Indicator */}
@@ -769,8 +795,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
             <p className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
               {isFlat 
-                ? "✨ 手機已平放！即將在 3 秒後自動熄滅蠟燭。"
-                : "用手指拖動可360°旋轉。欣賞完畢後，請放平手機，3秒後蠟燭將自動熄滅！"}
+                ? "手機已平放，蠟燭即將熄滅並綻放禮花。"
+                : "手指拖動屏幕中央蛋糕可旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"}
             </p>
 
             {/* Simulated blowout button for non-gyroscopic desktop testing */}
@@ -780,7 +806,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
                 className="w-full py-2.5 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs sm:text-sm text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
               >
                 <Wind className="w-4 h-4 flex-shrink-0" />
-                <span>電腦測試/手動吹蠟燭</span>
+                <span>吹熄蠟燭，放禮花</span>
               </button>
             </div>
           </div>

@@ -21,12 +21,12 @@ export default defineConfig(() => {
     },
     build: {
       // Ensure proper module format
-      target: 'es2015',
-      minify: 'esbuild',
+      target: 'es2015' as const,
+      minify: 'esbuild' as const,
       sourcemap: false,
       rollupOptions: {
         output: {
-          format: 'es',
+          format: 'es' as const,
         },
       },
     },
