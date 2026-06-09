@@ -32,6 +32,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   const [betaValue, setBetaValue] = useState<number>(0);
   const [gammaValue, setGammaValue] = useState<number>(0);
   const [showPermissionPrompt, setShowPermissionPrompt] = useState<boolean>(false);
+  const [sensorActive, setSensorActive] = useState<boolean>(false);
 
   // 3D Engine References using useRef to avoid React state re-render lags
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -99,14 +100,18 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     const beta = e.beta !== null ? e.beta : 0;
     const gamma = e.gamma !== null ? e.gamma : 0;
 
+    if (e.beta !== null || e.gamma !== null) {
+      setSensorActive(true);
+    }
+
     setBetaValue(Math.round(beta));
     setGammaValue(Math.round(gamma));
 
     // Screen-up flat is usually beta ~= 0 and gamma ~= 0. Some mobile browsers
     // report around 180 when screen-down, so accept that as a stable flat pose too.
     const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
-    // Relaxed thresholds for easier detection on mobile devices
-    const isPhoneFlat = normalizedBeta < 65 && Math.abs(gamma) < 65;
+    // Let's make flat detection extremely relaxed and responsive
+    const isPhoneFlat = normalizedBeta < 45 && Math.abs(gamma) < 45;
     orientationRef.current = { beta, gamma, isFlat: isPhoneFlat };
     setIsFlat(isPhoneFlat);
   };
@@ -123,6 +128,12 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         } else {
           // Android and modern Desktop allows binding directly
           window.addEventListener('deviceorientation', handleOrientation);
+          // Quick check if the event fires
+          const tempCheck = () => {
+            setSensorActive(true);
+            window.removeEventListener('deviceorientation', tempCheck);
+          };
+          window.addEventListener('deviceorientation', tempCheck);
         }
       } else {
         setShowPermissionPrompt(false);
@@ -141,6 +152,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         const response = await reqPermission();
         if (response === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation);
+          setSensorActive(true);
           setShowPermissionPrompt(false);
           // Trigger vibration to confirm permission granted
           try {
@@ -158,6 +170,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     } else {
       // Fallback for browsers that don't require explicit permission
       window.addEventListener('deviceorientation', handleOrientation);
+      setSensorActive(true);
       setShowPermissionPrompt(false);
     }
   };
@@ -289,12 +302,22 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x050507, 1);
     renderer.domElement.style.touchAction = 'none';
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.78;
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // Add delicate ambient illumination to color core volume
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    const ambientLight = new THREE.AmbientLight(0xfff4dc, 0.55);
     scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffe2b4, 1.15);
+    keyLight.position.set(3.5, 6, 4.5);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.PointLight(0xff9fb8, 0.75, 10);
+    fillLight.position.set(-3.5, 2.5, 4);
+    scene.add(fillLight);
 
     // 2. Beautiful Controls with enhanced touch support
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -327,9 +350,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     const renderScene = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(width, height),
-      1.8,  // strength
-      0.65, // radius
-      0.08  // threshold (low for glowing candles)
+      0.75, // strength
+      0.38, // radius
+      0.42  // threshold keeps cake matte while candles still glow
     );
     
     const composer = new EffectComposer(renderer);
@@ -373,6 +396,41 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     const particleTexture = createCircleTexture();
 
+    const addCakeBodyTier = (
+      radius: number,
+      height: number,
+      centerY: number,
+      color: number,
+      frostingColor: number,
+    ) => {
+      const bodyGeom = new THREE.CylinderGeometry(radius, radius * 0.96, height, 96, 1, false);
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.92,
+        metalness: 0.02,
+      });
+      const body = new THREE.Mesh(bodyGeom, bodyMat);
+      body.position.y = centerY;
+      cakeGroup.add(body);
+
+      const frostingGeom = new THREE.TorusGeometry(radius * 0.98, 0.075, 12, 96);
+      const frostingMat = new THREE.MeshStandardMaterial({
+        color: frostingColor,
+        roughness: 0.86,
+        metalness: 0.0,
+      });
+
+      const topFrosting = new THREE.Mesh(frostingGeom, frostingMat);
+      topFrosting.position.y = centerY + height / 2 + 0.025;
+      topFrosting.rotation.x = Math.PI / 2;
+      cakeGroup.add(topFrosting);
+
+      const bottomFrosting = new THREE.Mesh(frostingGeom.clone(), frostingMat.clone());
+      bottomFrosting.position.y = centerY - height / 2 + 0.03;
+      bottomFrosting.rotation.x = Math.PI / 2;
+      cakeGroup.add(bottomFrosting);
+    };
+
     // Helper to generate a hollow-cylinder aesthetic tier
     const buildCakeTier = (
       params: { radius: number; height: number; startY: number; pCount: number; accentColor: number; subColor: number }
@@ -383,6 +441,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
       const colorA = new THREE.Color(accentColor);
       const colorB = new THREE.Color(subColor);
+      const shadowColor = new THREE.Color(0x2b1710);
 
       for (let i = 0; i < pCount; i++) {
         // We pack layers primarily on the outer shell, with some volume inward
@@ -398,7 +457,12 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
         // Mix custom high-luxury gradients
         const lerpVal = Math.random();
-        const mixedColor = colorA.clone().lerp(colorB, lerpVal);
+        const verticalShade = 0.58 + ((y - startY) / height) * 0.28;
+        const mixedColor = colorA
+          .clone()
+          .lerp(colorB, lerpVal)
+          .lerp(shadowColor, Math.random() * 0.22)
+          .multiplyScalar(verticalShade);
         colors[i * 3] = mixedColor.r;
         colors[i * 3 + 1] = mixedColor.g;
         colors[i * 3 + 2] = mixedColor.b;
@@ -414,8 +478,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         size: sizeVal,
         map: particleTexture,
         transparent: true,
-        opacity: 0.85,
-        blending: THREE.AdditiveBlending,
+        opacity: 0.48,
+        blending: THREE.NormalBlending,
         depthWrite: false,
         vertexColors: true
       });
@@ -423,37 +487,39 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       return new THREE.Points(geom, mat);
     };
 
-    // Construct the three stunning tiers
-    // Bottom Tiers: Royal Gold & Champagne
+    // Matte cake bodies carry the realistic volume; particles add the magical edge.
+    addCakeBodyTier(2.2, 1.0, -0.5, 0x7a4b27, 0xc8944d);
+    addCakeBodyTier(1.6, 0.9, 0.45, 0xb85d68, 0xe8a9b4);
+    addCakeBodyTier(1.0, 0.8, 1.3, 0xd8b577, 0xf3dec1);
+
+    // Construct three particle tiers with subtler dessert-like tones.
     const tier1 = buildCakeTier({
       radius: 2.2,
       height: 1.0,
       startY: -1.0,
-      pCount: 2800,
-      accentColor: 0xd4ab59, // Gold
-      subColor: 0x8b561c    // Cocoa brown
+      pCount: 1800,
+      accentColor: 0xb8783d,
+      subColor: 0x6f3f22
     });
     cakeGroup.add(tier1);
 
-    // Middle Tiers: French Rose Pink & Coral
     const tier2 = buildCakeTier({
       radius: 1.6,
       height: 0.9,
       startY: 0.0,
-      pCount: 2000,
-      accentColor: 0xf43f5e, // Cherry Rose
-      subColor: 0xfbcfe8    // Sweet Candy
+      pCount: 1400,
+      accentColor: 0xc86f78,
+      subColor: 0xf0bcc4
     });
     cakeGroup.add(tier2);
 
-    // Top Tiers: Creamy Pearl White & Champagne Glow
     const tier3 = buildCakeTier({
       radius: 1.0,
       height: 0.8,
       startY: 0.9,
-      pCount: 1200,
-      accentColor: 0xe6ce93, // Light gold
-      subColor: 0xfff1f2    // Cream rose
+      pCount: 900,
+      accentColor: 0xcda45a,
+      subColor: 0xf3ddbd
     });
     cakeGroup.add(tier3);
 
@@ -492,8 +558,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       size: 0.1,
       map: particleTexture,
       transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.75,
+      blending: THREE.NormalBlending,
       vertexColors: true
     });
     const candleStick = new THREE.Points(candleGeom, candleMat);
@@ -577,7 +643,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       size: 0.14,
       map: particleTexture,
       transparent: true,
-      opacity: 0.95,
+      opacity: 0.42,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       vertexColors: true
@@ -727,9 +793,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
           if (statusLabelRef.current) {
             const remainingTime = Math.ceil(remainingCountdown * 10) / 10;
             statusLabelRef.current.textContent = 
-              flatTimeRef.current >= 0.5 
-                ? `即將自動熄滅... (${remainingTime.toFixed(1)}秒)`
-                : `偵測平放中...`;
+              flatTimeRef.current >= 0.4 
+                ? `✨ 已平放！即將熄滅... (${remainingTime.toFixed(1)}秒)`
+                : `✨ 手機已平放！`;
           }
 
           // Auto-blowout after a short, stable flat pose.
@@ -743,7 +809,18 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             progressBarRef.current.style.width = `0%`;
           }
           if (statusLabelRef.current) {
-            statusLabelRef.current.textContent = `請將手機放平`;
+            const { beta, gamma } = orientationRef.current;
+            if (beta === 999 && gamma === 999) {
+              statusLabelRef.current.textContent = `請將手機放平`;
+            } else {
+              const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
+              const maxTilt = Math.max(Math.round(normalizedBeta), Math.round(Math.abs(gamma)));
+              if (maxTilt < 55) {
+                statusLabelRef.current.textContent = `接近平放！再放平一點點 (傾斜:${maxTilt}°)`;
+              } else {
+                statusLabelRef.current.textContent = `請再放得平一點 (傾斜:${maxTilt}°)`;
+              }
+            }
           }
         }
       }
@@ -782,10 +859,10 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       
       // Dispose geometry/materials
       scene.traverse((object: any) => {
-        if (object.isPoints) {
+        if (object.isPoints || object.isMesh) {
           object.geometry.dispose();
           if (Array.isArray(object.material)) {
-            object.material.forEach((m) => m.dispose());
+            object.material.forEach((m: any) => m.dispose());
           } else {
             object.material.dispose();
           }
@@ -813,42 +890,53 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
       {/* Interactive Sensor Overlay Container for Step 2 - Mobile optimized */}
       {step === 2 && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-full max-w-sm px-3 sm:px-4 z-20 pointer-events-auto">
-          <div className="glass-morphism rounded-2xl p-3 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[310px] sm:max-w-sm px-2 z-20 pointer-events-auto">
+          <div className="glass-morphism rounded-2xl p-2.5 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
             
             {/* Visual Tilt Sensors Indicator */}
-            <div className="flex items-center gap-2 w-full justify-between mb-2">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 w-full justify-between mb-1.5">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
                 <Compass className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isFlat ? 'text-gold-200 animate-spin' : 'text-gray-400'}`} />
-                <span ref={statusLabelRef} className="text-xs font-serif font-semibold text-gold-100 uppercase tracking-wider truncate">
-                  請將手機放平
+                <span ref={statusLabelRef} className="text-[11px] sm:text-xs font-serif font-semibold text-gold-100 uppercase tracking-wider truncate">
+                  {sensorActive ? "請將手機放平" : "未偵測到感應器訊號"}
                 </span>
               </div>
               
-              <div className="flex gap-2 font-mono text-[8px] sm:text-[9px] text-gray-400 flex-shrink-0 ml-1">
+              <div className="flex gap-1.5 font-mono text-[8px] sm:text-[9px] text-gray-400 flex-shrink-0 ml-1">
                 <span>B: {betaValue}°</span>
                 <span>G: {gammaValue}°</span>
               </div>
             </div>
 
             {/* Custom progress bar */}
-            <div className="w-full h-2 bg-stone-900/80 rounded-full overflow-hidden border border-white/5 mb-3">
+            <div className="w-full h-1.5 bg-stone-900/80 rounded-full overflow-hidden border border-white/5 mb-2">
               <div ref={progressBarRef} className="h-full w-0 bg-gradient-to-r from-gold-400 to-pink-500 rounded-full transition-all duration-75" />
             </div>
 
-            <p className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
+            <p className="text-[8.5px] sm:text-[10px] text-gray-450 text-center leading-relaxed font-sans max-w-[280px]">
               {isFlat 
-                ? "✨ 手機已平放！蠟燭即將熄滅並綻放禮花。"
-                : "用手指拖動屏幕中央蛋糕360°旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"}
+                ? "✨ 手機已平放！蠟燭即將自動熄滅並綻放禮花。"
+                : sensorActive 
+                  ? "用手指拖動蛋糕360°旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"
+                  : "⚠️ 陀螺儀未啟用。請放平手機。若無反應，請嘗試點擊下方按鈕授權或手動吹熄。"}
             </p>
 
-            {/* Simulated blowout button for non-gyroscopic desktop testing */}
-            <div className="w-full mt-3 pt-3 border-t border-white/5 flex flex-col justify-center items-center">
+            {/* Simulated blowout / request sensor permission button */}
+            <div className="w-full mt-2 pt-2 border-t border-white/5 flex flex-col gap-1.5 justify-center items-center">
+              {!sensorActive && (
+                <button
+                  onClick={requestGyroPermission}
+                  className="w-full py-1.5 bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 border border-amber-500/20 text-[9px] sm:text-[10px] text-amber-200 rounded flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Compass className="w-3.5 h-3.5 flex-shrink-0 animate-pulse" />
+                  <span>授權啟用平放偵測 (陀螺儀)</span>
+                </button>
+              )}
               <button
                 onClick={forceBlowEvent}
-                className="w-full py-2.5 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs sm:text-sm text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+                className="w-full py-2 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs sm:text-sm text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
               >
-                <Wind className="w-4 h-4 flex-shrink-0" />
+                <Wind className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>吹熄蠟燭，放禮花</span>
               </button>
             </div>

@@ -156,24 +156,24 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto glass-morphism rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
+    <div className="w-full max-w-sm sm:max-w-md mx-auto glass-morphism rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-2xl relative overflow-hidden flex flex-col items-center">
       {/* Decorative Golden Ambient Lights */}
       <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-gold-400 opacity-10 blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-pink-500 opacity-10 blur-3xl pointer-events-none"></div>
 
-      <div className="text-center mb-4 sm:mb-6">
-        <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-gold-300/20 bg-gold-400/5 mb-2 sm:mb-3">
-          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-300 animate-pulse flex-shrink-0" />
-          <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] text-gold-200 whitespace-nowrap">First Step · 核心儀式</span>
+      <div className="text-center mb-3 sm:mb-4">
+        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-gold-300/20 bg-gold-400/5 mb-1.5 sm:mb-2">
+          <Sparkles className="w-3 h-3 text-gold-300 animate-pulse flex-shrink-0" />
+          <span className="text-[8px] sm:text-[9px] font-mono uppercase tracking-[0.2em] text-gold-200 whitespace-nowrap">First Step · 核心儀式</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gold-200 tracking-wide font-semibold">生日紀念寫真</h2>
-        <p className="text-[11px] sm:text-xs text-gray-400 mt-1.5 sm:mt-2 font-sans leading-relaxed">
+        <h2 className="text-xl sm:text-2xl font-serif text-gold-200 tracking-wide font-semibold">生日紀念寫真</h2>
+        <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 font-sans leading-relaxed">
           請拍攝或上傳一張紀念照，這將永久珍藏在您的生日賀卡中。
         </p>
       </div>
 
       {/* Video / Photo Preview Stage */}
-      <div className="w-full aspect-[4/3] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
+      <div className="w-full max-w-[260px] sm:max-w-[300px] aspect-[4/3] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20 space-y-2 sm:space-y-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-gold-300 border-t-transparent rounded-full animate-spin"></div>
