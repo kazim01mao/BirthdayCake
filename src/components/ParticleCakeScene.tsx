@@ -760,29 +760,22 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       }
 
       // Check flat sensor countdown on step 2
-      if (step === 2 && !isTriggeredRef.current && !controlsInteractingRef.current) {
+      if (step === 2 && !isTriggeredRef.current) {
         if (orientationRef.current.isFlat) {
           // If flat orientation is established
           flatTimeRef.current += delta;
           
           // Trigger vibration feedback at key milestones
-          if (flatTimeRef.current >= 0.4 && flatTimeRef.current < 0.5) {
+          if (flatTimeRef.current >= 0.3 && flatTimeRef.current < 0.4) {
             try {
               navigator.vibrate?.(25);
             } catch (e) {
               console.log('Vibration not available');
             }
           }
-          if (flatTimeRef.current >= 0.8 && flatTimeRef.current < 0.9) {
-            try {
-              navigator.vibrate?.([25, 25]);
-            } catch (e) {
-              console.log('Vibration not available');
-            }
-          }
           
           // Update auto-blowout countdown
-          const totalFlatTime = 1.2;
+          const totalFlatTime = 0.8;
           const remainingCountdown = Math.max(0, totalFlatTime - flatTimeRef.current);
           
           const p = Math.min(1.0, flatTimeRef.current / totalFlatTime);
@@ -793,7 +786,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
           if (statusLabelRef.current) {
             const remainingTime = Math.ceil(remainingCountdown * 10) / 10;
             statusLabelRef.current.textContent = 
-              flatTimeRef.current >= 0.4 
+              flatTimeRef.current >= 0.3 
                 ? `✨ 已平放！即將熄滅... (${remainingTime.toFixed(1)}秒)`
                 : `✨ 手機已平放！`;
           }
@@ -803,10 +796,11 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             triggerBlowout();
           }
         } else {
-          // Reset flat timer
-          flatTimeRef.current = 0;
+          // Decaying decay instead of instant wipeout
+          flatTimeRef.current = Math.max(0, flatTimeRef.current - delta * 1.5);
           if (progressBarRef.current) {
-            progressBarRef.current.style.width = `0%`;
+            const p = Math.min(1.0, flatTimeRef.current / 0.8);
+            progressBarRef.current.style.width = `${p * 100}%`;
           }
           if (statusLabelRef.current) {
             const { beta, gamma } = orientationRef.current;
