@@ -1,0 +1,6 @@
+{
+  "name": "Grand Luxury 3D Particle Birthday Cake",
+  "description": "A high-fidelity 3D WebGL particle birthday cake experience with webcam selfie capturing, gyroscope device orientation candle blowing, and custom blessing Polaroid-style cards.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

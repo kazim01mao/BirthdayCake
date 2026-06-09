@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-gold-50: #faf6eb;
+  --color-gold-100: #f4ecce;
+  --color-gold-200: #e6ce93;
+  --color-gold-300: #d4ab59;
+  --color-gold-400: #c18b31;
+  --color-gold-500: #a77023;
+  --color-gold-600: #8b561c;
+  --color-gold-700: #6e4016;
+  --color-gold-800: #553013;
+  --color-gold-900: #3c210e;
+
+  --color-cyan-neon: #00FFFF;
+  --color-pink-neon: #FF69B4;
+}
+
+/* Custom global animations and styling based on Immersive Theme */
+body {
+  background-color: #020202;
+  color: #ffffff;
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+}
+
+.neon-glow-text {
+  color: #ffffff;
+  text-shadow: 0 0 10px #00FFFF, 0 0 25px rgba(0, 255, 255, 0.61), 0 0 45px rgba(0, 255, 255, 0.3);
+}
+
+.glow-text-gold {
+  color: #ffffff;
+  text-shadow: 0 0 10px #e6ce93, 0 0 20px rgba(212, 171, 89, 0.7);
+}
+
+.glow-text-pink {
+  text-shadow: 0 0 10px #FF69B4, 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.polaroid-sepia {
+  filter: sepia(25%) contrast(108%) brightness(102%);
+}
+
+.badge-cyan {
+  color: #00FFFF;
+  border-color: #00FFFF;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.15);
+}
+
+.badge-pink {
+  color: #FF69B4;
+  border-color: #FF69B4;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.15);
+}
+
+.badge-gold {
+  color: #d4ab59;
+  border-color: #d4ab59;
+  box-shadow: 0 0 10px rgba(212, 171, 89, 0.15);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020202;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4ab59;
+  border-radius: 3px;
+}
+
