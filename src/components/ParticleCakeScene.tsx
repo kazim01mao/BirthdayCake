@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { Compass, RotateCw, Wind, Info, CheckCircle2 } from 'lucide-react';
+import { Compass, Wind } from 'lucide-react';
 
 interface ParticleCakeSceneProps {
   step: number;
@@ -28,8 +28,6 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   const statusLabelRef = useRef<HTMLSpanElement>(null);
 
   // Sensor reading states
-  const [gyroSupported, setGyroSupported] = useState<boolean>(true);
-  const [gyroAuthorized, setGyroAuthorized] = useState<boolean>(false);
   const [isFlat, setIsFlat] = useState<boolean>(false);
   const [betaValue, setBetaValue] = useState<number>(0);
   const [gammaValue, setGammaValue] = useState<number>(0);
@@ -64,11 +62,19 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     if (isTriggeredRef.current) return;
 
     isTriggeredRef.current = true;
-    navigator.vibrate?.([35, 45, 90]);
-    for (let i = 0; i < 4; i++) {
+    
+    // Trigger multiple vibration patterns for feedback
+    try {
+      navigator.vibrate?.([50, 100, 30, 100, 50, 150, 100]);
+    } catch (e) {
+      console.log('Vibration API not available');
+    }
+    
+    // Trigger fireworks burst sequence
+    for (let i = 0; i < 6; i++) {
       setTimeout(() => {
         createFireworkBurst();
-      }, i * 180);
+      }, i * 140);
     }
     onBlowTriggered();
   };
@@ -99,7 +105,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     // Screen-up flat is usually beta ~= 0 and gamma ~= 0. Some mobile browsers
     // report around 180 when screen-down, so accept that as a stable flat pose too.
     const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
-    const isPhoneFlat = normalizedBeta < 48 && Math.abs(gamma) < 48;
+    // Relaxed thresholds for easier detection on mobile devices
+    const isPhoneFlat = normalizedBeta < 65 && Math.abs(gamma) < 65;
     orientationRef.current = { beta, gamma, isFlat: isPhoneFlat };
     setIsFlat(isPhoneFlat);
   };
@@ -116,10 +123,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         } else {
           // Android and modern Desktop allows binding directly
           window.addEventListener('deviceorientation', handleOrientation);
-          setGyroAuthorized(true);
         }
       } else {
-        setGyroSupported(false);
+        setShowPermissionPrompt(false);
       }
     }
 
@@ -135,17 +141,24 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         const response = await reqPermission();
         if (response === 'granted') {
           window.addEventListener('deviceorientation', handleOrientation);
-          setGyroAuthorized(true);
           setShowPermissionPrompt(false);
+          // Trigger vibration to confirm permission granted
+          try {
+            navigator.vibrate?.([30, 50, 30]);
+          } catch (e) {
+            console.log('Vibration not available');
+          }
         } else {
-          alert("您拒絕了陀螺儀授權。別擔心，您仍可以使用「模擬吹氣」按鈕完成體驗！");
-          setGyroAuthorized(false);
           setShowPermissionPrompt(false);
         }
       } catch (e) {
         console.error("Gyro authorization request failed:", e);
         setShowPermissionPrompt(false);
       }
+    } else {
+      // Fallback for browsers that don't require explicit permission
+      window.addEventListener('deviceorientation', handleOrientation);
+      setShowPermissionPrompt(false);
     }
   };
 
@@ -283,15 +296,17 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);
 
-    // 2. Beautiful Controls
+    // 2. Beautiful Controls with enhanced touch support
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableRotate = true;
     controls.enablePan = false;
     controls.enableZoom = true;
-    controls.rotateSpeed = 0.9;
-    controls.zoomSpeed = 0.6;
+    controls.rotateSpeed = 1.2;  // Slightly increased for mobile
+    controls.zoomSpeed = 0.8;    // Slightly increased for mobile
+    
+    // Enhanced touch support for mobile
     controls.touches.ONE = THREE.TOUCH.ROTATE;
     controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
     controls.target.set(0, 0.45, 0);
@@ -679,15 +694,32 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       }
 
       // Check flat sensor countdown on step 2
-      if (step === 2 && !isTriggeredRef.current) {
+      if (step === 2 && !isTriggeredRef.current && !controlsInteractingRef.current) {
         if (orientationRef.current.isFlat) {
           // If flat orientation is established
           flatTimeRef.current += delta;
           
-          // Update auto-blowout countdown
-          const remainingCountdown = Math.max(0, 1.1 - flatTimeRef.current);
+          // Trigger vibration feedback at key milestones
+          if (flatTimeRef.current >= 0.4 && flatTimeRef.current < 0.5) {
+            try {
+              navigator.vibrate?.(25);
+            } catch (e) {
+              console.log('Vibration not available');
+            }
+          }
+          if (flatTimeRef.current >= 0.8 && flatTimeRef.current < 0.9) {
+            try {
+              navigator.vibrate?.([25, 25]);
+            } catch (e) {
+              console.log('Vibration not available');
+            }
+          }
           
-          const p = Math.min(1.0, flatTimeRef.current / 1.1);
+          // Update auto-blowout countdown
+          const totalFlatTime = 1.2;
+          const remainingCountdown = Math.max(0, totalFlatTime - flatTimeRef.current);
+          
+          const p = Math.min(1.0, flatTimeRef.current / totalFlatTime);
           
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `${p * 100}%`;
@@ -696,12 +728,12 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             const remainingTime = Math.ceil(remainingCountdown * 10) / 10;
             statusLabelRef.current.textContent = 
               flatTimeRef.current >= 0.5 
-                ? `即將自動熄滅... (${remainingTime}秒)`
+                ? `即將自動熄滅... (${remainingTime.toFixed(1)}秒)`
                 : `偵測平放中...`;
           }
 
           // Auto-blowout after a short, stable flat pose.
-          if (flatTimeRef.current >= 1.1) {
+          if (flatTimeRef.current >= totalFlatTime) {
             triggerBlowout();
           }
         } else {
@@ -774,9 +806,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       {/* 3D WebGL Canvas Layer */}
       <div 
         ref={containerRef} 
-        className={`w-full h-full touch-none transition-all duration-1000 ${
+        className={`w-full h-full touch-none cursor-grab active:cursor-grabbing transition-all duration-1000 ${
           step === 3 && isExtinguished ? 'filter brightness-90 animate-pulse-slow' : ''
-        }`} 
+        }`}
       />
 
       {/* Interactive Sensor Overlay Container for Step 2 - Mobile optimized */}
@@ -806,8 +838,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
             <p className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
               {isFlat 
-                ? "手機已平放，蠟燭即將熄滅並綻放禮花。"
-                : "手指拖動屏幕中央蛋糕可旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"}
+                ? "✨ 手機已平放！蠟燭即將熄滅並綻放禮花。"
+                : "用手指拖動屏幕中央蛋糕360°旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"}
             </p>
 
             {/* Simulated blowout button for non-gyroscopic desktop testing */}
@@ -843,7 +875,6 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
               <button
                 onClick={() => {
                   setShowPermissionPrompt(false);
-                  setGyroAuthorized(false);
                 }}
                 className="w-full py-2 text-stone-400 hover:text-stone-300 text-xs transition px-3 rounded-lg underline cursor-pointer"
               >

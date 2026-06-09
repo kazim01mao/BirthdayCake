@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import PolaroidCard from './components/PolaroidCard';
 import ParticleCakeScene from './components/ParticleCakeScene';
-import { Sparkles, Heart, Gift, Volume2, VolumeX, ArrowRight, Camera, HelpCircle, MailOpen } from 'lucide-react';
+import { Sparkles, Gift, MailOpen } from 'lucide-react';
 import SelfieCamera from './components/SelfieCamera';
 
 export default function App() {

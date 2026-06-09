@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Heart, Sparkles, Copy, Check, X, RotateCcw } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Copy, Check, X, RotateCcw } from 'lucide-react';
 
 interface PolaroidCardProps {
   photo: string;
