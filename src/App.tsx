@@ -11,10 +11,6 @@ export default function App() {
   const [isExtinguished, setIsExtinguished] = useState<boolean>(false);
   const [isCardOpen, setIsCardOpen] = useState<boolean>(false);
   
-  // Real-time telemetry simulation
-  const [gyroBeta, setGyroBeta] = useState<number>(0);
-  const [gyroGamma, setGyroGamma] = useState<number>(0);
-
   // URL Customizer State
   const [name, setName] = useState<string>('');
   const [blessing, setBlessing] = useState<string>('');
@@ -36,15 +32,7 @@ export default function App() {
     // Prepare soft luxury background piano chime music
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2017/2017-84.wav'); // simple clean magic chime sound
 
-    // Listen to device orientation to feed the telemetry HUD in real-time
-    const updateOrientationHUD = (e: DeviceOrientationEvent) => {
-      if (e.beta !== null) setGyroBeta(Math.round(e.beta * 100) / 100);
-      if (e.gamma !== null) setGyroGamma(Math.round(e.gamma * 100) / 100);
-    };
-
-    window.addEventListener('deviceorientation', updateOrientationHUD);
     return () => {
-      window.removeEventListener('deviceorientation', updateOrientationHUD);
       if (celebrationTimerRef.current !== null) {
         window.clearTimeout(celebrationTimerRef.current);
       }
@@ -129,11 +117,11 @@ export default function App() {
           </div>
           <div className="flex justify-between gap-4">
             <span>ORIENTATION_BETA</span>
-            <span className="text-cyan-neon">{gyroBeta !== 0 ? `${gyroBeta}°` : '-0.25°'}</span>
+            <span className="text-cyan-neon">-0.25°</span>
           </div>
           <div className="flex justify-between gap-4">
             <span>ORIENTATION_GAMMA</span>
-            <span className="text-cyan-neon">{gyroGamma !== 0 ? `${gyroGamma}°` : '0.12°'}</span>
+            <span className="text-cyan-neon">0.12°</span>
           </div>
           <div className="flex justify-between gap-4">
             <span>POST_BLOOM</span>

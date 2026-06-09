@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { Compass, RotateCw, Wind, Info, CheckCircle2 } from 'lucide-react';
+import { Wind } from 'lucide-react';
 
 interface ParticleCakeSceneProps {
   step: number;
@@ -24,16 +24,6 @@ interface FireworkType {
 
 export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggered }: ParticleCakeSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const progressBarRef = useRef<HTMLDivElement>(null);
-  const statusLabelRef = useRef<HTMLSpanElement>(null);
-
-  // Sensor reading states
-  const [gyroSupported, setGyroSupported] = useState<boolean>(true);
-  const [gyroAuthorized, setGyroAuthorized] = useState<boolean>(false);
-  const [isFlat, setIsFlat] = useState<boolean>(false);
-  const [betaValue, setBetaValue] = useState<number>(0);
-  const [gammaValue, setGammaValue] = useState<number>(0);
-  const [showPermissionPrompt, setShowPermissionPrompt] = useState<boolean>(false);
 
   // 3D Engine References using useRef to avoid React state re-render lags
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -51,13 +41,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   // Animation Phase Controls
   const flameIntensityRef = useRef<number>(1.0);
   const fireworksRef = useRef<FireworkType[]>([]);
-  const flatTimeRef = useRef<number>(0);
   const isTriggeredRef = useRef<boolean>(false);
-  const orientationRef = useRef<{ beta: number; gamma: number; isFlat: boolean }>({
-    beta: 999,
-    gamma: 999,
-    isFlat: false,
-  });
   const controlsInteractingRef = useRef<boolean>(false);
 
   // Watch for isExtinguished state change
@@ -72,69 +56,6 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
       }
     }
   }, [isExtinguished]);
-
-  // Handle Gyroscope Event Listener
-  const handleOrientation = (e: DeviceOrientationEvent) => {
-    if (isTriggeredRef.current || step !== 2) return;
-
-    const beta = e.beta !== null ? e.beta : 0;
-    const gamma = e.gamma !== null ? e.gamma : 0;
-
-    setBetaValue(Math.round(beta));
-    setGammaValue(Math.round(gamma));
-
-    // Screen-up flat is usually beta ~= 0 and gamma ~= 0. Some mobile browsers
-    // report around 180 when screen-down, so accept that as a stable flat pose too.
-    const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
-    const isPhoneFlat = normalizedBeta < 35 && Math.abs(gamma) < 35;
-    orientationRef.current = { beta, gamma, isFlat: isPhoneFlat };
-    setIsFlat(isPhoneFlat);
-  };
-
-  // Check orientation API on page 2
-  useEffect(() => {
-    if (step === 2) {
-      // Check if feature is available
-      if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-        const reqPermission = (DeviceOrientationEvent as any).requestPermission;
-        if (typeof reqPermission === 'function') {
-          // iOS requires explicit permission first
-          setShowPermissionPrompt(true);
-        } else {
-          // Android and modern Desktop allows binding directly
-          window.addEventListener('deviceorientation', handleOrientation);
-          setGyroAuthorized(true);
-        }
-      } else {
-        setGyroSupported(false);
-      }
-    }
-
-    return () => {
-      window.removeEventListener('deviceorientation', handleOrientation);
-    };
-  }, [step]);
-
-  const requestGyroPermission = async () => {
-    const reqPermission = (DeviceOrientationEvent as any).requestPermission;
-    if (typeof reqPermission === 'function') {
-      try {
-        const response = await reqPermission();
-        if (response === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
-          setGyroAuthorized(true);
-          setShowPermissionPrompt(false);
-        } else {
-          alert("您拒絕了陀螺儀授權。別擔心，您仍可以使用「模擬吹氣」按鈕完成體驗！");
-          setGyroAuthorized(false);
-          setShowPermissionPrompt(false);
-        }
-      } catch (e) {
-        console.error("Gyro authorization request failed:", e);
-        setShowPermissionPrompt(false);
-      }
-    }
-  };
 
   // Helper function to create white particle texture
   const createCircleTexture = (): THREE.CanvasTexture => {
@@ -669,45 +590,6 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         }
       }
 
-      // Check flat sensor countdown on step 2
-      if (step === 2 && !isTriggeredRef.current) {
-        if (orientationRef.current.isFlat) {
-          // If flat orientation is established
-          flatTimeRef.current += delta;
-          
-          // Update auto-blowout countdown
-          const remainingCountdown = Math.max(0, 2.2 - flatTimeRef.current);
-          
-          const p = Math.min(1.0, flatTimeRef.current / 2.2);
-          
-          if (progressBarRef.current) {
-            progressBarRef.current.style.width = `${p * 100}%`;
-          }
-          if (statusLabelRef.current) {
-            const remainingTime = Math.ceil(remainingCountdown * 10) / 10;
-            statusLabelRef.current.textContent = 
-              flatTimeRef.current >= 0.5 
-                ? `即將自動熄滅... (${remainingTime}秒)`
-                : `偵測平放中...`;
-          }
-
-          // Auto-blowout after being flat for 2.2 seconds
-          if (flatTimeRef.current >= 2.2) {
-            isTriggeredRef.current = true;
-            onBlowTriggered();
-          }
-        } else {
-          // Reset flat timer
-          flatTimeRef.current = 0;
-          if (progressBarRef.current) {
-            progressBarRef.current.style.width = `0%`;
-          }
-          if (statusLabelRef.current) {
-            statusLabelRef.current.textContent = `請將手機放平`;
-          }
-        }
-      }
-
       // Composer output is vital for Bloom Pass Glow
       composer.render();
       animId = requestAnimationFrame(tick);
@@ -788,75 +670,21 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         }`} 
       />
 
-      {/* Interactive Sensor Overlay Container for Step 2 - Mobile optimized */}
+      {/* Interactive Overlay Container for Step 2 - Mobile optimized */}
       {step === 2 && (
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 w-full max-w-sm px-3 sm:px-4 z-20 pointer-events-auto">
           <div className="glass-morphism rounded-2xl p-3 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
-            
-            {/* Visual Tilt Sensors Indicator */}
-            <div className="flex items-center gap-2 w-full justify-between mb-2">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Compass className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isFlat ? 'text-gold-200 animate-spin' : 'text-gray-400'}`} />
-                <span ref={statusLabelRef} className="text-xs font-serif font-semibold text-gold-100 uppercase tracking-wider truncate">
-                  請將手機放平
-                </span>
-              </div>
-              
-              <div className="flex gap-2 font-mono text-[8px] sm:text-[9px] text-gray-400 flex-shrink-0 ml-1">
-                <span>B: {betaValue}°</span>
-                <span>G: {gammaValue}°</span>
-              </div>
-            </div>
-
-            {/* Custom progress bar */}
-            <div className="w-full h-2 bg-stone-900/80 rounded-full overflow-hidden border border-white/5 mb-3">
-              <div ref={progressBarRef} className="h-full w-0 bg-gradient-to-r from-gold-400 to-pink-500 rounded-full transition-all duration-75" />
-            </div>
-
-            <p className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
-              {isFlat 
-                ? "手機已平放，蠟燭即將熄滅並綻放禮花。"
-                : "手指拖動屏幕中央蛋糕可旋轉。放平手機，或點擊下方按鈕吹熄蠟燭。"}
+            <p className="text-[10px] sm:text-xs text-gray-300 text-center leading-relaxed font-sans max-w-[280px] mb-3">
+              手指拖動屏幕中央蛋糕可旋轉。雙指夾捏進行縮放。點擊下方按鈕吹熄蠟燭。
             </p>
 
-            {/* Simulated blowout button for non-gyroscopic desktop testing */}
-            <div className="w-full mt-3 pt-3 border-t border-white/5 flex flex-col justify-center items-center">
+            <div className="w-full pt-3 border-t border-white/5 flex flex-col justify-center items-center">
               <button
                 onClick={forceBlowEvent}
                 className="w-full py-2.5 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs sm:text-sm text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
               >
                 <Wind className="w-4 h-4 flex-shrink-0" />
                 <span>吹熄蠟燭，放禮花</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Interactive Gyroscope IOS permission invitation dialog - Mobile optimized */}
-      {showPermissionPrompt && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-30 flex items-center justify-center p-4 sm:p-6">
-          <div className="glass-morphism rounded-3xl p-4 sm:p-6 max-w-sm w-full text-center space-y-3 sm:space-y-4 border border-gold-300/20 shadow-2xl">
-            <Compass className="w-10 h-10 sm:w-12 sm:h-12 text-gold-300 mx-auto animate-pulse" />
-            <h4 className="text-lg sm:text-xl font-serif font-bold text-gold-200">啟動陀螺儀感應</h4>
-            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-              iOS 設備要求用戶手動授權啟用手機陀螺儀。這將允許您通過「平放手機」實現自動吹滅蠟燭的互動效果！
-            </p>
-            <div className="space-y-2 pt-2">
-              <button
-                onClick={requestGyroPermission}
-                className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-gold-500 to-gold-300 hover:from-gold-600 hover:to-gold-400 text-black font-semibold rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-gold-500/10 active:scale-95"
-              >
-                確認授權陀螺儀
-              </button>
-              <button
-                onClick={() => {
-                  setShowPermissionPrompt(false);
-                  setGyroAuthorized(false);
-                }}
-                className="w-full py-2 text-stone-400 hover:text-stone-300 text-xs transition px-3 rounded-lg underline cursor-pointer"
-              >
-                不授權，直接使用手動按鈕
               </button>
             </div>
           </div>
