@@ -253,9 +253,14 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     scene.fog = new THREE.FogExp2(0x050507, 0.05);
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    // Position slightly above the cake looking down elegantly
-    camera.position.set(0, 2.6, 7.2);
+    const aspect = width / height;
+    const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+    
+    // Position dynamically calculated to prevent overflow on mobile and leave space
+    const initialDistance = Math.max(7.43, 7.43 / aspect);
+    const yUnit = 1.85 / 7.43;
+    const zUnit = 7.2 / 7.43;
+    camera.position.set(0, 0.75 + initialDistance * yUnit, initialDistance * zUnit);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -280,12 +285,12 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     controls.rotateSpeed = 0.9;
     controls.zoomSpeed = 0.6;
     controls.touches.ONE = THREE.TOUCH.ROTATE;
-    controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+    controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
     controls.target.set(0, 0.75, 0);
     controls.minPolarAngle = Math.PI * 0.22;
     controls.maxPolarAngle = Math.PI * 0.72;
-    controls.minDistance = 4.6;
-    controls.maxDistance = 9.5;
+    controls.minDistance = Math.max(4.6, 4.6 / aspect);
+    controls.maxDistance = Math.max(9.5, 9.5 / aspect);
     controls.addEventListener('start', () => {
       controlsInteractingRef.current = true;
     });
@@ -712,13 +717,28 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     // 9. Resize Handling
     const handleResize = () => {
-      if (!containerRef.current || !renderer || !camera || !composer) return;
+      if (!containerRef.current || !renderer || !camera || !composer || !controlsRef.current) return;
       
       const w = containerRef.current.clientWidth;
       const h = containerRef.current.clientHeight;
+      const aspect = w / h;
 
-      camera.aspect = w / h;
+      camera.aspect = aspect;
       camera.updateProjectionMatrix();
+
+      // Dynamically calculate distance to prevent overflow on mobile and leave space
+      const distance = Math.max(7.43, 7.43 / aspect);
+      const controls = controlsRef.current;
+      controls.minDistance = Math.max(4.6, 4.6 / aspect);
+      controls.maxDistance = Math.max(9.5, 9.5 / aspect);
+
+      if (!controlsInteractingRef.current) {
+        const yUnit = 1.85 / 7.43;
+        const zUnit = 7.2 / 7.43;
+        camera.position.set(0, 0.75 + distance * yUnit, distance * zUnit);
+        controls.target.set(0, 0.75, 0);
+        controls.update();
+      }
 
       renderer.setSize(w, h);
       composer.setSize(w, h);
@@ -740,7 +760,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         if (object.isPoints) {
           object.geometry.dispose();
           if (Array.isArray(object.material)) {
-            object.material.forEach((m) => m.dispose());
+            object.material.forEach((m: any) => m.dispose());
           } else {
             object.material.dispose();
           }
