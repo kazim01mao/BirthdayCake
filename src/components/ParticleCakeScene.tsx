@@ -60,6 +60,19 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   });
   const controlsInteractingRef = useRef<boolean>(false);
 
+  const triggerBlowout = () => {
+    if (isTriggeredRef.current) return;
+
+    isTriggeredRef.current = true;
+    navigator.vibrate?.([35, 45, 90]);
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        createFireworkBurst();
+      }, i * 180);
+    }
+    onBlowTriggered();
+  };
+
   // Watch for isExtinguished state change
   useEffect(() => {
     if (isExtinguished) {
@@ -86,7 +99,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     // Screen-up flat is usually beta ~= 0 and gamma ~= 0. Some mobile browsers
     // report around 180 when screen-down, so accept that as a stable flat pose too.
     const normalizedBeta = Math.min(Math.abs(beta), Math.abs(Math.abs(beta) - 180));
-    const isPhoneFlat = normalizedBeta < 35 && Math.abs(gamma) < 35;
+    const isPhoneFlat = normalizedBeta < 48 && Math.abs(gamma) < 48;
     orientationRef.current = { beta, gamma, isFlat: isPhoneFlat };
     setIsFlat(isPhoneFlat);
   };
@@ -255,7 +268,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     // Position slightly above the cake looking down elegantly
-    camera.position.set(0, 2.6, 7.2);
+    camera.position.set(0, 2.0, 9.8);
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -281,11 +294,11 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
     controls.zoomSpeed = 0.6;
     controls.touches.ONE = THREE.TOUCH.ROTATE;
     controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
-    controls.target.set(0, 0.75, 0);
+    controls.target.set(0, 0.45, 0);
     controls.minPolarAngle = Math.PI * 0.22;
     controls.maxPolarAngle = Math.PI * 0.72;
-    controls.minDistance = 4.6;
-    controls.maxDistance = 9.5;
+    controls.minDistance = 7.4;
+    controls.maxDistance = 12.5;
     controls.addEventListener('start', () => {
       controlsInteractingRef.current = true;
     });
@@ -338,7 +351,8 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
     // 5. Build the Grand Luxury 3D Particle Cake Setup
     const cakeGroup = new THREE.Group();
-    cakeGroup.position.set(0, -0.25, 0);
+    cakeGroup.position.set(0, -0.35, 0);
+    cakeGroup.scale.setScalar(0.72);
     scene.add(cakeGroup);
     cakeGroupRef.current = cakeGroup;
 
@@ -671,9 +685,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
           flatTimeRef.current += delta;
           
           // Update auto-blowout countdown
-          const remainingCountdown = Math.max(0, 2.2 - flatTimeRef.current);
+          const remainingCountdown = Math.max(0, 1.1 - flatTimeRef.current);
           
-          const p = Math.min(1.0, flatTimeRef.current / 2.2);
+          const p = Math.min(1.0, flatTimeRef.current / 1.1);
           
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `${p * 100}%`;
@@ -686,10 +700,9 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
                 : `偵測平放中...`;
           }
 
-          // Auto-blowout after being flat for 2.2 seconds
-          if (flatTimeRef.current >= 2.2) {
-            isTriggeredRef.current = true;
-            onBlowTriggered();
+          // Auto-blowout after a short, stable flat pose.
+          if (flatTimeRef.current >= 1.1) {
+            triggerBlowout();
           }
         } else {
           // Reset flat timer
@@ -753,9 +766,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
   // Handle forcing/simulating the blowing event (highly useful for desktops)
   const forceBlowEvent = () => {
-    if (isTriggeredRef.current) return;
-    isTriggeredRef.current = true;
-    onBlowTriggered();
+    triggerBlowout();
   };
 
   return (

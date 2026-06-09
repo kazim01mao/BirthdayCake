@@ -71,7 +71,7 @@ export default function App() {
     }
     celebrationTimerRef.current = window.setTimeout(() => {
       setStep(3);
-    }, 1600);
+    }, 2600);
   };
 
   const handleReset = () => {

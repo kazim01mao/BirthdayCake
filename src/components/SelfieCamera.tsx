@@ -57,7 +57,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
       
       const constraints = {
         video: {
-          facingMode: { ideal: 'user' },
+          facingMode: { ideal: 'environment' },
           width: { ideal: 640 },
           height: { ideal: 480 }
         },
@@ -99,15 +99,8 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
         canvas.width = video.videoWidth || 640;
         canvas.height = video.videoHeight || 480;
         
-        // Mirror the photo for selfie comfort
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-        
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Reset scale
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        
+
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         setCapturedPhoto(dataUrl);
         stopCamera();
@@ -194,7 +187,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
             autoPlay
             playsInline
             muted
-            className="w-full h-full object-cover scale-x-[-1]"
+            className="w-full h-full object-cover"
           />
         )}
 
@@ -225,7 +218,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="user"
+        capture="environment"
         onChange={handleFileUpload}
         className="hidden"
       />
