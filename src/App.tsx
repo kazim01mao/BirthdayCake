@@ -93,18 +93,18 @@ export default function App() {
         </div>
       )}
 
-      {/* STAGE STATUS HUD BAR (Top Right) */}
-      <div className="absolute top-5 right-6 z-30 pointer-events-none hidden md:flex items-center gap-3">
-        <div className="badge badge-cyan px-3 py-1 rounded-full border text-[9px] font-mono tracking-widest flex items-center gap-1.5 uppercase bg-black/40">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-neon animate-pulse" />
+      {/* STAGE STATUS HUD BAR (Top Right) - Hidden on mobile */}
+      <div className="absolute top-5 right-6 z-30 pointer-events-none hidden lg:flex items-center gap-2">
+        <div className="badge badge-cyan px-2 py-0.5 rounded-full border text-[7px] sm:text-[9px] font-mono tracking-widest flex items-center gap-1 uppercase bg-black/40">
+          <span className="w-1 h-1 rounded-full bg-cyan-neon animate-pulse" />
           CAM_LIVE
         </div>
-        <div className="badge badge-pink px-3 py-1 rounded-full border text-[9px] font-mono tracking-widest flex items-center gap-1.5 uppercase bg-black/40">
-          <span className="w-1.5 h-1.5 rounded-full bg-pink-neon animate-pulse" />
+        <div className="badge badge-pink px-2 py-0.5 rounded-full border text-[7px] sm:text-[9px] font-mono tracking-widest flex items-center gap-1 uppercase bg-black/40">
+          <span className="w-1 h-1 rounded-full bg-pink-neon animate-pulse" />
           GYRO_SYNC
         </div>
-        <div className="badge badge-gold px-3 py-1 rounded-full border text-[9px] font-mono tracking-widest flex items-center gap-1.5 uppercase bg-black/40">
-          <span className="w-1.5 h-1.5 rounded-full bg-gold-350" />
+        <div className="badge badge-gold px-2 py-0.5 rounded-full border text-[7px] sm:text-[9px] font-mono tracking-widest flex items-center gap-1 uppercase bg-black/40">
+          <span className="w-1 h-1 rounded-full bg-gold-350" />
           BLOOM_ACTIVE
         </div>
       </div>
@@ -153,20 +153,20 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-0 flex flex-col justify-center items-center px-4 overflow-y-auto py-10 z-20"
+            className="absolute inset-0 flex flex-col justify-center items-center px-3 sm:px-4 overflow-y-auto py-6 sm:py-10 z-20"
           >
             {/* Elegant Background ambient decorations */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gold-400/5 blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 sm:w-96 md:w-[500px] h-64 sm:h-96 md:h-[500px] rounded-full bg-gold-400/5 blur-3xl pointer-events-none" />
 
-            <div className="text-center max-w-md mb-8">
-              <div className="text-[10px] font-mono text-gold-300 tracking-[0.3em] uppercase mb-1">
+            <div className="text-center max-w-md mb-6 sm:mb-8">
+              <div className="text-[9px] sm:text-[10px] font-mono text-gold-300 tracking-[0.3em] uppercase mb-1">
                 MEMOIR ENGINE · EST 2026
               </div>
-              <h1 className="text-4xl sm:text-5xl font-serif tracking-wide text-transparent bg-gradient-to-b from-white via-gold-100 to-gold-300 bg-clip-text font-bold mb-4 drop-shadow-xl select-text leading-tight uppercase">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif tracking-wide text-transparent bg-gradient-to-b from-white via-gold-100 to-gold-300 bg-clip-text font-bold mb-3 sm:mb-4 drop-shadow-xl select-text leading-tight uppercase">
                 璀璨星河生日 केक
               </h1>
-              <p className="text-xs text-gray-400 leading-relaxed max-w-xs mx-auto text-center font-sans mt-3">
-                一場融合尖端 3D WebGL、環境感應、以及電影級發光技術的頂奢生日驚喜，為您呈現獨一無二的夢幻儀式。
+              <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed max-w-xs mx-auto text-center font-sans mt-2 sm:mt-3">
+                一場融合 3D WebGL、環境感應、與煙火效果的頂奢生日驚喜。
               </p>
             </div>
 
@@ -216,37 +216,37 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
-            className="absolute inset-0 flex flex-col justify-between p-6 z-10 pointer-events-none"
+            className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6 z-10 pointer-events-none"
           >
             {/* Top Glowing Title text */}
-            <div className="w-full text-center pt-24">
+            <div className="w-full text-center pt-16 sm:pt-20 md:pt-24">
               <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, type: "spring" }}
-                className="space-y-4 px-4"
+                className="space-y-2 sm:space-y-3 md:space-y-4 px-3 sm:px-4"
               >
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-[10px] font-mono tracking-widest text-pink-300 uppercase">
-                  <Gift className="w-3.5 h-3.5 text-pink-400" />
-                  儀式吹熄成功 · RITUAL COMPLETED
+                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-[8px] sm:text-[10px] font-mono tracking-widest text-pink-300 uppercase whitespace-nowrap">
+                  <Gift className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-pink-400 flex-shrink-0" />
+                  <span>儀式吹熄成功</span>
                 </div>
 
-                <h1 className="text-4xl sm:text-6xl font-serif text-white tracking-tight font-bold neon-glow-text select-text py-2">
-                  Happy Birthday, {name}!
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white tracking-tight font-bold neon-glow-text select-text py-1 sm:py-2 leading-tight">
+                  Happy Birthday<br className="sm:hidden" /> {name}!
                 </h1>
                 
-                <div className="text-xs sm:text-sm font-mono tracking-[0.25em] text-gold-300 uppercase">
+                <div className="text-[8px] sm:text-[10px] font-mono tracking-[0.25em] text-gold-300 uppercase whitespace-normal sm:whitespace-nowrap">
                   WISHING YOU A RADIANT YEAR AHEAD
                 </div>
 
-                <p className="text-xs text-gray-300 max-w-sm mx-auto font-sans leading-relaxed pt-2">
-                  ✨ 燭光已逝，星河漫天。璀璨星辰與漫天禮花正為你盛裝合奏。祝願你的生活如星光粒子般璀璨閃耀。
+                <p className="text-[10px] sm:text-xs text-gray-300 max-w-sm mx-auto font-sans leading-relaxed pt-1 sm:pt-2">
+                  ✨ 燭光已逝，星河漫天。祝願你的生活璀璨閃耀。
                 </p>
               </motion.div>
             </div>
 
             {/* Bottom floating button overlay */}
-            <div className="w-full pb-10 flex flex-col items-center pointer-events-auto">
+            <div className="w-full pb-6 sm:pb-10 flex flex-col items-center pointer-events-auto">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
@@ -255,10 +255,10 @@ export default function App() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-                className="py-4 px-10 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-xs tracking-[0.18em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-2 cursor-pointer transition-all duration-300"
+                className="py-3 sm:py-4 px-6 sm:px-10 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-xs sm:text-sm tracking-[0.18em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-2 cursor-pointer transition-all duration-300"
               >
-                <MailOpen className="w-4 h-4 text-gold-300" />
-                打開專屬生日賀卡
+                <MailOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-300 flex-shrink-0" />
+                <span className="whitespace-nowrap">打開生日賀卡</span>
               </motion.button>
             </div>
           </motion.div>

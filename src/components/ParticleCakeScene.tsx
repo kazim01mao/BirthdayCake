@@ -53,6 +53,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   const fireworksRef = useRef<FireworkType[]>([]);
   const flatTimeRef = useRef<number>(0);
   const isTriggeredRef = useRef<boolean>(false);
+  const autoBlowCountdownRef = useRef<number>(0); // Auto-blowout countdown timer
 
   // Watch for isExtinguished state change
   useEffect(() => {
@@ -642,22 +643,32 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         if (Math.abs(betaValue) < 15 && Math.abs(gammaValue) < 15) {
           // If flat orientation is established
           flatTimeRef.current += delta;
+          
+          // Update auto-blowout countdown
+          autoBlowCountdownRef.current = Math.max(0, 3.5 - flatTimeRef.current);
+          
           const p = Math.min(1.0, flatTimeRef.current / 1.5);
           
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `${p * 100}%`;
           }
           if (statusLabelRef.current) {
-            statusLabelRef.current.textContent = `偵測平放中... 請輕輕呼氣 (${Math.ceil((1.5 - flatTimeRef.current) * 10) / 10}秒)`;
+            const remainingTime = Math.ceil(autoBlowCountdownRef.current * 10) / 10;
+            statusLabelRef.current.textContent = 
+              flatTimeRef.current >= 1.5 
+                ? `即將自動熄滅... (${remainingTime}秒)`
+                : `偵測平放中... 請輕輕呼氣 (${Math.ceil((1.5 - flatTimeRef.current) * 10) / 10}秒)`;
           }
 
-          if (flatTimeRef.current >= 1.5) {
+          // Auto-blowout after being flat for 3.5 seconds
+          if (flatTimeRef.current >= 3.5) {
             isTriggeredRef.current = true;
             onBlowTriggered();
           }
         } else {
           // Reset flat timer
           flatTimeRef.current = 0;
+          autoBlowCountdownRef.current = 0;
           if (progressBarRef.current) {
             progressBarRef.current.style.width = `0%`;
           }
@@ -731,21 +742,21 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
         }`} 
       />
 
-      {/* Interactive Sensor Overlay Container for Step 2 */}
+      {/* Interactive Sensor Overlay Container for Step 2 - Mobile optimized */}
       {step === 2 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-20 pointer-events-auto">
-          <div className="glass-morphism rounded-2xl p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-3 sm:px-4 z-20 pointer-events-auto">
+          <div className="glass-morphism rounded-2xl p-3 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
             
             {/* Visual Tilt Sensors Indicator */}
-            <div className="flex items-center gap-3 w-full justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Compass className={`w-5 h-5 ${isFlat ? 'text-gold-200 animate-spin' : 'text-gray-400'}`} />
-                <span ref={statusLabelRef} className="text-xs font-serif font-semibold text-gold-100 uppercase tracking-wider">
+            <div className="flex items-center gap-2 w-full justify-between mb-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Compass className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isFlat ? 'text-gold-200 animate-spin' : 'text-gray-400'}`} />
+                <span ref={statusLabelRef} className="text-xs font-serif font-semibold text-gold-100 uppercase tracking-wider truncate">
                   請將手機放平
                 </span>
               </div>
               
-              <div className="flex gap-2 font-mono text-[9px] text-gray-400">
+              <div className="flex gap-2 font-mono text-[8px] sm:text-[9px] text-gray-400 flex-shrink-0 ml-1">
                 <span>B: {betaValue}°</span>
                 <span>G: {gammaValue}°</span>
               </div>
@@ -756,39 +767,39 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
               <div ref={progressBarRef} className="h-full w-0 bg-gradient-to-r from-gold-400 to-pink-500 rounded-full transition-all duration-75" />
             </div>
 
-            <p className="text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
+            <p className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-relaxed font-sans max-w-[280px]">
               {isFlat 
-                ? "✨ 手機已平放！現在請輕吹一口氣，像吹滅蠟燭那樣吹向麥克風/充電口。"
-                : "用手指拖動可360°旋轉。欣賞完畢後，請放平手機，讓充電口對準嘴，輕輕吹氣。"}
+                ? "✨ 手機已平放！即將在 3 秒後自動熄滅蠟燭。"
+                : "用手指拖動可360°旋轉。欣賞完畢後，請放平手機，3秒後蠟燭將自動熄滅！"}
             </p>
 
             {/* Simulated blowout button for non-gyroscopic desktop testing */}
             <div className="w-full mt-3 pt-3 border-t border-white/5 flex flex-col justify-center items-center">
               <button
                 onClick={forceBlowEvent}
-                className="w-full py-2 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+                className="w-full py-2.5 bg-gold-400/10 hover:bg-gold-400/20 active:scale-95 border border-gold-400/20 hover:border-gold-300/40 text-xs sm:text-sm text-gold-200 font-serif font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
               >
-                <Wind className="w-4 h-4" />
-                電腦測試/直接手動吹蠟燭 💨
+                <Wind className="w-4 h-4 flex-shrink-0" />
+                <span>電腦測試/手動吹蠟燭</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Interactive Gyroscope IOS permission invitation dialog */}
+      {/* Interactive Gyroscope IOS permission invitation dialog - Mobile optimized */}
       {showPermissionPrompt && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-30 flex items-center justify-center p-6">
-          <div className="glass-morphism rounded-3xl p-6 max-w-sm w-full text-center space-y-4 border border-gold-300/20 shadow-2xl">
-            <Compass className="w-12 h-12 text-gold-300 mx-auto animate-pulse" />
-            <h4 className="text-xl font-serif font-bold text-gold-200">啟動陀螺儀感應</h4>
-            <p className="text-xs text-gray-300 leading-relaxed font-sans">
-              iOS 設備要求用戶手動授權啟用手機陀螺儀。這將允許您通過「平放手機並吹氣」等手勢實現吹滅蠟燭的超凡互動！
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-30 flex items-center justify-center p-4 sm:p-6">
+          <div className="glass-morphism rounded-3xl p-4 sm:p-6 max-w-sm w-full text-center space-y-3 sm:space-y-4 border border-gold-300/20 shadow-2xl">
+            <Compass className="w-10 h-10 sm:w-12 sm:h-12 text-gold-300 mx-auto animate-pulse" />
+            <h4 className="text-lg sm:text-xl font-serif font-bold text-gold-200">啟動陀螺儀感應</h4>
+            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+              iOS 設備要求用戶手動授權啟用手機陀螺儀。這將允許您通過「平放手機」實現自動吹滅蠟燭的互動效果！
             </p>
             <div className="space-y-2 pt-2">
               <button
                 onClick={requestGyroPermission}
-                className="w-full py-3 bg-gradient-to-r from-gold-500 to-gold-300 hover:from-gold-600 hover:to-gold-400 text-black font-semibold rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-gold-500/10"
+                className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-gold-500 to-gold-300 hover:from-gold-600 hover:to-gold-400 text-black font-semibold rounded-xl text-sm transition-all cursor-pointer shadow-lg shadow-gold-500/10 active:scale-95"
               >
                 確認授權陀螺儀
               </button>
@@ -799,7 +810,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
                 }}
                 className="w-full py-2 text-stone-400 hover:text-stone-300 text-xs transition px-3 rounded-lg underline cursor-pointer"
               >
-                不授權，直接使用手動按鈕體驗
+                不授權，直接使用手動按鈕
               </button>
             </div>
           </div>

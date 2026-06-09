@@ -148,28 +148,28 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto glass-morphism rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
+    <div className="w-full max-w-lg mx-auto glass-morphism rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
       {/* Decorative Golden Ambient Lights */}
       <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-gold-400 opacity-10 blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-pink-500 opacity-10 blur-3xl pointer-events-none"></div>
 
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold-300/20 bg-gold-400/5 mb-3">
-          <Sparkles className="w-4 h-4 text-gold-300 animate-pulse" />
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold-200">First Step · 核心儀式</span>
+      <div className="text-center mb-4 sm:mb-6">
+        <div className="inline-flex items-center gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-gold-300/20 bg-gold-400/5 mb-2 sm:mb-3">
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-300 animate-pulse flex-shrink-0" />
+          <span className="text-[8px] sm:text-[10px] font-mono uppercase tracking-[0.2em] text-gold-200 whitespace-nowrap">First Step · 核心儀式</span>
         </div>
-        <h2 className="text-3xl font-serif text-gold-200 tracking-wide font-semibold">生日紀念寫真</h2>
-        <p className="text-xs text-gray-400 mt-2 font-sans leading-relaxed">
-          請拍攝或上傳一張當下的紀念照，這張照片將會永久珍藏在您的專屬生日賀卡中。
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gold-200 tracking-wide font-semibold">生日紀念寫真</h2>
+        <p className="text-[11px] sm:text-xs text-gray-400 mt-1.5 sm:mt-2 font-sans leading-relaxed">
+          請拍攝或上傳一張紀念照，這將永久珍藏在您的生日賀卡中。
         </p>
       </div>
 
       {/* Video / Photo Preview Stage */}
-      <div className="w-full aspect-[4/3] bg-black/40 rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
+      <div className="w-full aspect-[4/3] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20 space-y-3">
-            <div className="w-10 h-10 border-2 border-gold-300 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs text-gold-100 font-mono">載入中 / 處理中...</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20 space-y-2 sm:space-y-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-gold-300 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-[9px] sm:text-xs text-gold-100 font-mono">載入中...</p>
           </div>
         )}
 
@@ -184,12 +184,12 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
         )}
 
         {!capturedPhoto && !cameraActive && !loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-4">
-            <Camera className="w-12 h-12 text-gold-300/40 animate-pulse" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center space-y-3 sm:space-y-4">
+            <Camera className="w-10 h-10 sm:w-12 sm:h-12 text-gold-300/40 animate-pulse" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gold-200">攝像頭不可用</p>
-              <p className="text-[11px] text-gray-500 max-w-[280px]">
-                請上傳本地照片，或在下方選用精美預設模特圖片完成體驗。
+              <p className="text-xs sm:text-sm font-medium text-gold-200">攝像頭不可用</p>
+              <p className="text-[10px] sm:text-[11px] text-gray-500 max-w-[260px]">
+                請上傳照片或選用精美預設圖片。
               </p>
             </div>
           </div>
@@ -215,58 +215,58 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
       />
 
       {/* Control Actions */}
-      <div className="w-full mt-6 space-y-4">
+      <div className="w-full mt-4 sm:mt-5 md:mt-6 space-y-3 sm:space-y-4">
         {!capturedPhoto ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {cameraActive ? (
               <button
                 id="btn-shutter-capture"
                 onClick={capturePhoto}
                 type="button"
-                className="w-full py-4 bg-gradient-to-r from-gold-500 to-gold-300 hover:from-gold-600 hover:to-gold-400 text-black font-semibold rounded-xl shadow-lg shadow-gold-500/10 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-300 hover:from-gold-600 hover:to-gold-400 text-black font-semibold rounded-lg sm:rounded-xl shadow-lg shadow-gold-500/10 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base"
               >
-                <Camera className="w-5 h-5" />
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 拍攝紀念照
               </button>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   id="btn-retry-camera"
                   onClick={startCamera}
                   type="button"
-                  className="py-3 px-4 rounded-xl border border-gold-300/20 hover:border-gold-300/50 bg-gold-400/5 text-xs text-gold-200 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl border border-gold-300/20 hover:border-gold-300/50 bg-gold-400/5 text-[10px] sm:text-xs text-gold-200 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  嘗試開啟相機
+                  <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  開啟相機
                 </button>
                 <button
                   id="btn-upload-file"
                   onClick={() => fileInputRef.current?.click()}
                   type="button"
-                  className="py-3 px-4 rounded-xl border border-pink-500/20 hover:border-pink-500/50 bg-pink-500/5 text-xs text-pink-200 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg sm:rounded-xl border border-pink-500/20 hover:border-pink-500/50 bg-pink-500/5 text-[10px] sm:text-xs text-pink-200 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Upload className="w-4 h-4" />
-                  上傳自訂照片
+                  <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  上傳照片
                 </button>
               </div>
             )}
 
-            {/* Error Message & Present Preset Selections */}
+            {/* Error Message & Preset Selections */}
             {permissionError && (
-              <div className="space-y-3">
-                <p className="text-[10px] text-red-400/80 leading-relaxed bg-red-950/20 p-3 rounded-lg border border-red-900/30 font-sans text-center">
-                  數位沙箱與瀏覽器權限限制，建議直接上傳本地精美照片，或快速點選下列法式高質感人像模板以繼續生日驚喜儀式：
+              <div className="space-y-2 sm:space-y-3">
+                <p className="text-[9px] sm:text-[10px] text-red-400/80 leading-relaxed bg-red-950/20 p-2.5 sm:p-3 rounded-lg border border-red-900/30 font-sans text-center">
+                  攝像頭無法使用，請上傳本地照片或選擇下列預設圖片：
                 </p>
-                <div className="flex justify-center gap-4 mt-2">
+                <div className="flex justify-center gap-2 sm:gap-3 mt-1.5 sm:mt-2">
                   {presetImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectPreset(img)}
-                      className="w-14 h-14 rounded-full overflow-hidden border-2 border-gold-400/20 hover:border-gold-300 active:scale-95 transition-all duration-300 shadow-md relative group cursor-pointer"
+                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 border-gold-400/20 hover:border-gold-300 active:scale-95 transition-all duration-300 shadow-md relative group cursor-pointer flex-shrink-0"
                     >
                       <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" alt={`Preset ${idx+1}`} />
                       <div className="absolute inset-0 bg-black/30 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                        <Sparkles className="w-3 h-3 text-gold-200" />
+                        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gold-200" />
                       </div>
                     </button>
                   ))}
@@ -275,23 +275,23 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
             )}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <button
               id="confirm-photo"
               onClick={confirmPhoto}
               type="button"
-              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-emerald-400 hover:from-emerald-700 hover:to-emerald-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/10 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 sm:py-4 bg-gradient-to-r from-emerald-600 to-emerald-400 hover:from-emerald-700 hover:to-emerald-500 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg shadow-emerald-500/10 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base"
             >
-              <Check className="w-5 h-5" />
-              確認此紀念照，開始生日儀式
+              <Check className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              確認開始生日儀式
             </button>
             <button
               id="retake-photo"
               onClick={retakePhoto}
               type="button"
-              className="w-full py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer border border-white/5"
+              className="w-full py-2.5 sm:py-3 bg-white/5 hover:bg-white/10 text-gray-300 text-[10px] sm:text-xs rounded-lg sm:rounded-xl transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer border border-white/5"
             >
-              重新拍攝 / 重新上傳
+              重新拍攝 / 上傳
             </button>
           </div>
         )}

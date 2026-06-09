@@ -1,0 +1,21 @@
+/*
+  X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
+
+/assets/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, immutable, max-age=31536000
+
+/assets/*.css
+  Content-Type: text/css; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, immutable, max-age=31536000
+
+/assets/*.woff
+/assets/*.woff2
+  Content-Type: font/woff2
+  Cache-Control: public, immutable, max-age=31536000
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
