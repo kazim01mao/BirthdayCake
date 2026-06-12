@@ -50,7 +50,6 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      // Delay revoke to ensure download starts
       setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       setSaved(true);
@@ -113,7 +112,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.drawImage(img, photoPadding, photoPadding, photoSize, photoSize);
         ctx.restore();
 
-        // Title text - single line, adaptive size
+        // Title text - adaptive font sizing, single line
         ctx.fillStyle = '#1c1917';
         ctx.font = `bold ${titleFontSize}px serif`;
         ctx.textAlign = 'center';
@@ -148,7 +147,6 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
 
   // Helper: wrap text into lines for canvas rendering
   const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-    // First split by explicit newlines, then word-wrap each segment
     const paragraphs = text.split('\n');
     const result: string[] = [];
     paragraphs.forEach((para) => {
@@ -200,14 +198,13 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
               referrerPolicy="no-referrer"
               crossOrigin="anonymous"
             />
-            {/* Polaroid flash glossy look */}
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
           </div>
 
           {/* Text Area */}
           <div className="w-full mt-5 sm:mt-6 text-center text-stone-800 px-1 flex flex-col items-center">
             {/* Configurable Title */}
-            <h3 className="font-serif text-lg xs:text-xl sm:text-2xl tracking-wide font-bold text-stone-900 leading-snug">
+            <h3 className="font-serif text-lg xs:text-xl sm:text-2xl tracking-wide font-bold text-stone-900 leading-snug whitespace-nowrap">
               {config.title}
             </h3>
 

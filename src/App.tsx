@@ -156,8 +156,8 @@ export default function App() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-3 sm:py-8 z-20 min-h-screen"
           >
-            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-3 sm:mb-5 flex-shrink-0">
-              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
+            <div className="text-center max-w-[95vw] xs:max-w-md sm:max-w-lg mb-3 sm:mb-5 flex-shrink-0">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1 whitespace-nowrap px-2">
                 {getCardConfig(name).step1Title}
               </h1>
             </div>
@@ -234,7 +234,7 @@ export default function App() {
                 transition={{ duration: 0.8, type: "spring" }}
                 className="space-y-2 sm:space-y-3 px-2 sm:px-4"
               >
-                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
+                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1 whitespace-nowrap">
                   願主賜恩典於你！
                 </h1>
 
