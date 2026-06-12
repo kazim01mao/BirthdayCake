@@ -681,7 +681,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             <div className="w-full pt-2 xs:pt-3 border-t border-white/5 flex flex-col justify-center items-center">
               <button
                 onClick={forceBlowEvent}
-                className="w-full py-2 xs:py-2.5 bg-gradient-to-r from-gold-400/30 via-gold-300/25 to-gold-400/30 hover:from-gold-400/50 hover:via-gold-300/40 hover:to-gold-400/50 active:scale-95 border border-gold-300/40 hover:border-gold-300/70 text-[11px] xs:text-xs sm:text-sm text-gold-100 font-serif font-bold rounded-lg flex items-center justify-center gap-1 xs:gap-1.5 transition-all duration-200 cursor-pointer shadow-[0_0_15px_rgba(212,171,89,0.2)] hover:shadow-[0_0_25px_rgba(212,171,89,0.4)]"
+                className="w-full py-2 xs:py-2.5 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.1em] xs:tracking-[0.12em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center justify-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300 active:scale-95"
               >
                 <Wind className="w-3.5 h-3.5 xs:w-4 xs:h-4 flex-shrink-0" />
                 <span>宜家開始享用蛋糕啦</span>

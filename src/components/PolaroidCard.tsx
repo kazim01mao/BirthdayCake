@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Download, X, Check, ArrowLeft } from 'lucide-react';
+import { Download, Check, ArrowLeft } from 'lucide-react';
 import { CardConfig } from '../cardConfig';
 
 interface PolaroidCardProps {
@@ -61,7 +61,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
     }
   };
 
-  // Canvas-based fallback compositor
+  // Canvas-based fallback compositor with dynamic height
   const compositeCardWithCanvas = (): Promise<Blob | null> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -70,11 +70,24 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         const canvas = document.createElement('canvas');
         const scale = 2;
         const cardW = 320;
-        const cardH = 440;
-        canvas.width = cardW * scale;
-        canvas.height = cardH * scale;
         const ctx = canvas.getContext('2d');
         if (!ctx) { resolve(null); return; }
+
+        // Pre-calculate text layout to determine dynamic card height
+        const photoPadding = 12;
+        const photoSize = cardW - photoPadding * 2;
+        const titleY = photoPadding + photoSize + 18;
+        const bodyY = titleY + 20;
+        const maxWidth = cardW - 30;
+
+        ctx.font = 'italic 11px sans-serif';
+        const lines = wrapText(ctx, config.body, maxWidth);
+        const dividerY = bodyY + lines.length * 16 + 8;
+        const timestampY = dividerY + 14;
+        const cardH = Math.max(440, timestampY + 20 + 50); // min 440, + bottom padding
+
+        canvas.width = cardW * scale;
+        canvas.height = cardH * scale;
 
         ctx.scale(scale, scale);
 
@@ -83,8 +96,6 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.fillRect(0, 0, cardW, cardH);
 
         // Photo area (square, top portion)
-        const photoPadding = 12;
-        const photoSize = cardW - photoPadding * 2;
         ctx.save();
         ctx.fillStyle = '#0a0a0a';
         ctx.fillRect(photoPadding, photoPadding, photoSize, photoSize);
@@ -92,25 +103,20 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.restore();
 
         // Title text
-        const titleY = photoPadding + photoSize + 18;
         ctx.fillStyle = '#1c1917';
         ctx.font = 'bold 16px serif';
         ctx.textAlign = 'center';
         ctx.fillText(config.title, cardW / 2, titleY);
 
         // Body text with line wrapping
-        const bodyY = titleY + 20;
         ctx.fillStyle = '#57534e';
         ctx.font = 'italic 11px sans-serif';
         ctx.textAlign = 'center';
-        const maxWidth = cardW - 30;
-        const lines = wrapText(ctx, config.body, maxWidth);
         lines.forEach((line, i) => {
           ctx.fillText(line, cardW / 2, bodyY + i * 16);
         });
 
         // Divider line
-        const dividerY = bodyY + lines.length * 16 + 8;
         ctx.strokeStyle = '#d6d3d1';
         ctx.beginPath();
         ctx.moveTo(cardW / 2 - 40, dividerY);
@@ -118,7 +124,6 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.stroke();
 
         // Timestamp
-        const timestampY = dividerY + 14;
         ctx.fillStyle = '#a8a29e';
         ctx.font = '9px monospace';
         ctx.fillText(config.timestamp, cardW / 2, timestampY);
@@ -174,13 +179,13 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         id="polaroid-card"
         className="relative w-full max-w-[90vw] xs:max-w-xs max-h-[98vh] overflow-y-auto bg-white p-3 sm:p-4 pb-3 sm:pb-5 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
       >
-        {/* Close Button */}
+        {/* Back Button - top right */}
         <button
           onClick={onClose}
-          className="absolute top-1.5 right-1.5 text-stone-400 hover:text-stone-700 p-1 rounded-full transition-colors cursor-pointer"
+          className="absolute top-1.5 right-1.5 flex items-center justify-center w-6 h-6 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100/60 transition-all duration-200 cursor-pointer"
           aria-label="返回"
         >
-          <X className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
         </button>
 
         {/* Return Button - top left */}
@@ -213,8 +218,8 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
             {config.title}
           </h3>
 
-          {/* Configurable Body */}
-          <div className="max-h-[80px] sm:max-h-[120px] overflow-y-auto pr-1 text-[10px] xs:text-[11px] sm:text-xs text-stone-600 font-sans italic leading-relaxed text-center scrollbar-thin mt-1.5 whitespace-pre-line">
+           {/* Configurable Body */}
+           <div className="pr-1 text-[10px] xs:text-[11px] sm:text-xs text-stone-600 font-sans italic leading-relaxed text-center mt-1.5 whitespace-pre-line">
             {config.body}
           </div>
 
@@ -240,7 +245,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
             ) : (
               <>
                 <Download className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0" />
-                <span>存儲至本地相冊</span>
+                <span>存儲至本地相簿</span>
               </>
             )}
           </button>

@@ -176,18 +176,18 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.0 }}
-            className="absolute inset-0 pointer-events-none z-10 flex items-start justify-center pt-[5vh] sm:pt-[6vh]"
-          >
-            {/* Ambient Screen Header overlay */}
-            <div className="w-full text-center px-4 sm:px-6">
+             className="absolute inset-0 pointer-events-none z-10 flex items-start justify-center pt-[18vh] sm:pt-[22vh] md:pt-[25vh]"
+           >
+             {/* Ambient Screen Header overlay */}
+             <div className="w-full text-center px-4 sm:px-6">
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
                 className="inline-flex flex-col items-center"
               >
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gold-200 font-bold tracking-wide drop-shadow-xl">
-                  生日快樂，平安喜樂！
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gold-200 font-bold tracking-wide drop-shadow-xl whitespace-pre-line">
+                  {getCardConfig(name).step2Title}
                 </h2>
               </motion.div>
             </div>
@@ -213,12 +213,12 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
-            className="absolute inset-0 flex flex-col justify-between p-3 sm:p-5 z-10 pointer-events-none overflow-y-auto"
+             className="absolute inset-0 flex flex-col justify-between p-3 sm:p-5 z-10 pointer-events-none overflow-y-auto pt-[12vh] sm:pt-[15vh] md:pt-[18vh]"
           >
             {/* Back button - top right */}
             <div className="absolute top-4 right-4 sm:top-5 sm:right-6 pointer-events-auto z-20">
               <button
-                onClick={() => { setIsCardOpen(false); setStep(2); }}
+                onClick={() => { setIsCardOpen(false); setIsExtinguished(false); setStep(2); }}
                 className="flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gold-200/60 hover:text-gold-200 transition-all duration-300 cursor-pointer backdrop-blur-sm"
                 aria-label="返回"
               >
@@ -226,8 +226,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* Top Glowing Title text */}
-            <div className="w-full text-center pt-[5vh] sm:pt-12 md:pt-16">
+             {/* Top Glowing Title text */}
+             <div className="w-full text-center">
               <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -244,8 +244,8 @@ export default function App() {
               </motion.div>
             </div>
 
-            {/* Bottom floating button overlay */}
-            <div className="w-full pb-3 sm:pb-8 flex flex-col items-center pointer-events-auto flex-shrink-0">
+             {/* Bottom floating button overlay */}
+             <div className="w-full pb-2 sm:pb-4 flex flex-col items-center pointer-events-auto flex-shrink-0">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
