@@ -172,25 +172,25 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
         id="polaroid-card"
-        className="relative w-full max-w-[92vw] xs:max-w-sm max-h-[95vh] overflow-y-auto bg-white p-2.5 xs:p-4 sm:p-5 pb-4 xs:pb-6 sm:pb-7 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
+        className="relative w-full max-w-[90vw] xs:max-w-xs max-h-[98vh] overflow-y-auto bg-white p-3 sm:p-4 pb-3 sm:pb-5 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-stone-400 hover:text-stone-700 p-1.5 rounded-full transition-colors cursor-pointer"
+          className="absolute top-1.5 right-1.5 text-stone-400 hover:text-stone-700 p-1 rounded-full transition-colors cursor-pointer"
           aria-label="返回"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Return Button - top left */}
         <button
           onClick={onReset}
-          className="absolute top-2 left-2 flex items-center gap-1 text-stone-400 hover:text-stone-700 py-1.5 pl-1.5 pr-2.5 rounded-full transition-colors cursor-pointer bg-stone-100/50 hover:bg-stone-200/70"
+          className="absolute top-1.5 left-1.5 flex items-center gap-0.5 text-stone-400 hover:text-stone-700 py-1 pl-1 pr-2 rounded-full transition-colors cursor-pointer bg-stone-100/50 hover:bg-stone-200/70"
           aria-label="返回重新拍攝"
         >
-          <ArrowLeft className="w-4 h-4 flex-shrink-0" />
-          <span className="text-[11px] font-sans font-medium">返回重拍</span>
+          <ArrowLeft className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="text-[10px] font-sans font-medium">返回重拍</span>
         </button>
 
         {/* Photo Container with subtle shadow and border */}
@@ -207,30 +207,30 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         </div>
 
         {/* Text Area */}
-        <div className="w-full mt-5 text-center text-stone-800 px-1 flex flex-col items-center">
+        <div className="w-full mt-4 text-center text-stone-800 px-1 flex flex-col items-center">
           {/* Configurable Title */}
-          <h3 className="font-serif text-lg xs:text-xl sm:text-2xl tracking-wide font-bold text-stone-900">
+          <h3 className="font-serif text-base xs:text-lg sm:text-xl tracking-wide font-bold text-stone-900">
             {config.title}
           </h3>
 
           {/* Configurable Body */}
-          <div className="max-h-[120px] xs:max-h-[160px] overflow-y-auto pr-1 text-[11px] xs:text-xs text-stone-600 font-sans italic leading-relaxed text-center scrollbar-thin mt-2.5 whitespace-pre-line">
+          <div className="max-h-[80px] sm:max-h-[120px] overflow-y-auto pr-1 text-[10px] xs:text-[11px] sm:text-xs text-stone-600 font-sans italic leading-relaxed text-center scrollbar-thin mt-1.5 whitespace-pre-line">
             {config.body}
           </div>
 
-          <div className="w-24 h-[1px] bg-stone-200 my-3" />
+          <div className="w-24 h-[1px] bg-stone-200 my-2" />
 
           {/* Configurable Timestamp */}
-          <p className="font-mono text-[9px] text-stone-400 tracking-widest uppercase">
+          <p className="font-mono text-[8px] text-stone-400 tracking-widest uppercase">
             {config.timestamp}
           </p>
         </div>
 
         {/* Control Button - Save to local photos */}
-        <div className="w-full mt-6">
+        <div className="w-full mt-5">
           <button
             onClick={saveToPhotos}
-            className="w-full flex items-center justify-center gap-2 py-2.5 xs:py-3 px-4 bg-stone-900 hover:bg-black text-white rounded-lg text-xs xs:text-sm font-sans tracking-wide transition-all duration-200 active:scale-95 cursor-pointer border border-stone-800"
+            className="w-full flex items-center justify-center gap-2 py-2 sm:py-2.5 px-4 bg-stone-900 hover:bg-black text-white rounded-lg text-[11px] xs:text-xs sm:text-sm font-sans tracking-wide transition-all duration-200 active:scale-95 cursor-pointer border border-stone-800"
           >
             {saved ? (
               <>

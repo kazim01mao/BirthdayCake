@@ -135,11 +135,11 @@ export default function App() {
         </div>
       )}
 
-      {/* LUXURY WATERMARK LOGO BRANDING */}
+      {/* WATERMARK LOGO BRANDING */}
       <div className="absolute top-5 left-6 z-30 pointer-events-none flex items-center gap-1.5 opacity-80">
         <Sparkles className="w-5 h-5 text-gold-300 animate-pulse" />
-        <span className="font-serif italic text-gold-100 tracking-wider text-[11px] uppercase">
-          GRAND LUXURY 3D EXPERIMENT
+        <span className="font-serif italic text-gold-100 tracking-wider text-[11px]">
+          Happy birthday!
         </span>
       </div>
 
@@ -154,10 +154,10 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-4 xs:py-6 sm:py-10 z-20 min-h-screen"
+            className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-3 sm:py-8 z-20 min-h-screen"
           >
-            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-2 xs:mb-3 sm:mb-5 flex-shrink-0">
-              <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
+            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-3 sm:mb-5 flex-shrink-0">
+              <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
                 Happy Birthday!
               </h1>
             </div>
@@ -213,10 +213,10 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
-            className="absolute inset-0 flex flex-col justify-between p-3 xs:p-4 sm:p-6 z-10 pointer-events-none overflow-y-auto"
+            className="absolute inset-0 flex flex-col justify-between p-3 sm:p-5 z-10 pointer-events-none overflow-y-auto"
           >
             {/* Back button - top right */}
-            <div className="absolute top-4 xs:top-5 right-4 xs:right-5 sm:right-6 pointer-events-auto z-20">
+            <div className="absolute top-4 right-4 sm:top-5 sm:right-6 pointer-events-auto z-20">
               <button
                 onClick={() => { setIsCardOpen(false); setStep(2); }}
                 className="flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gold-200/60 hover:text-gold-200 transition-all duration-300 cursor-pointer backdrop-blur-sm"
@@ -227,25 +227,25 @@ export default function App() {
             </div>
 
             {/* Top Glowing Title text */}
-            <div className="w-full text-center pt-[8vh] xs:pt-[10vh] sm:pt-16 md:pt-20">
+            <div className="w-full text-center pt-[5vh] sm:pt-12 md:pt-16">
               <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, type: "spring" }}
-                className="space-y-1.5 xs:space-y-2 sm:space-y-3 px-2 xs:px-3 sm:px-4"
+                className="space-y-2 sm:space-y-3 px-2 sm:px-4"
               >
-                <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
+                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
                   願主賜恩典於你！
                 </h1>
 
-                <p className="text-[13px] xs:text-sm sm:text-base md:text-lg text-gray-300/90 max-w-[90vw] xs:max-w-xs sm:max-w-md mx-auto font-sans leading-relaxed pt-1 sm:pt-2 px-2">
+                <p className="text-xs sm:text-sm md:text-base text-gray-300/90 max-w-[90vw] xs:max-w-xs sm:max-w-md mx-auto font-sans leading-relaxed pt-1 sm:pt-2 px-2">
                   在新的一歲裡，恩典滿滿，每日都有與主同行的美好~
                 </p>
               </motion.div>
             </div>
 
             {/* Bottom floating button overlay */}
-            <div className="w-full pb-3 xs:pb-5 sm:pb-8 flex flex-col items-center pointer-events-auto flex-shrink-0">
+            <div className="w-full pb-3 sm:pb-8 flex flex-col items-center pointer-events-auto flex-shrink-0">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
@@ -254,7 +254,7 @@ export default function App() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-                className="py-2.5 xs:py-3 sm:py-4 px-5 xs:px-6 sm:px-10 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.18em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-1.5 xs:gap-2 cursor-pointer transition-all duration-300"
+                className="py-2 xs:py-2.5 sm:py-3 px-4 xs:px-5 sm:px-8 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-[10px] xs:text-[11px] sm:text-xs tracking-[0.1em] xs:tracking-[0.12em] sm:tracking-[0.15em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300"
               >
                 <MailOpen className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 text-gold-300 flex-shrink-0" />
                 <span className="whitespace-nowrap">打開生日賀卡</span>
