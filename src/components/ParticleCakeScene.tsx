@@ -166,6 +166,10 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Reset blow trigger when scene is rebuilt (e.g. back from step 3)
+    isTriggeredRef.current = false;
+    flameIntensityRef.current = 1.0;
+
     // 1. Initial Scene Setup
     const width = containerRef.current.clientWidth || window.innerWidth;
     const height = containerRef.current.clientHeight || window.innerHeight;
