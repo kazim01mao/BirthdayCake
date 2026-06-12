@@ -173,9 +173,9 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
       <div className="relative flex flex-col items-center max-h-[98vh] w-full max-w-[90vw] xs:max-w-xs">
         {/* Polaroid Card - pure white card for snapshot */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 30, rotate: -2 }}
-          animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 0 }}
+          initial={{ opacity: 0, scale: 0.9, y: 30, rotate: -3 }}
+          animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 3 }}
           transition={{ type: "spring", damping: 25, stiffness: 120 }}
           id="polaroid-card"
           className="relative w-full overflow-hidden bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
