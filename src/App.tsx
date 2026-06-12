@@ -245,7 +245,7 @@ export default function App() {
             </div>
 
              {/* Bottom floating button overlay */}
-             <div className="w-full pb-2 sm:pb-4 flex flex-col items-center pointer-events-auto flex-shrink-0">
+             <div className="w-full pb-20 xs:pb-24 sm:pb-28 flex flex-col items-center pointer-events-auto flex-shrink-0">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
