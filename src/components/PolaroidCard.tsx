@@ -73,22 +73,33 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         const ctx = canvas.getContext('2d');
         if (!ctx) { resolve(null); return; }
 
-        // Pre-calculate text layout to determine dynamic card height
         const photoPadding = 12;
         const photoSize = cardW - photoPadding * 2;
         const titleY = photoPadding + photoSize + 22;
-        const bodyY = titleY + 24;
         const maxWidth = cardW - 30;
 
+        // 1. Calculate title font size adaptively for single line
+        const titleMaxWidth = cardW - 36;
+        let titleFontSize = 22;
+        while (titleFontSize > 12) {
+          ctx.font = `bold ${titleFontSize}px serif`;
+          const titleMeasure = ctx.measureText(config.title);
+          if (titleMeasure.width <= titleMaxWidth) break;
+          titleFontSize -= 1;
+        }
+        const finalBodyY = titleY + titleFontSize + 6;
+
+        // 2. Body text layout
         ctx.font = 'italic 13px sans-serif';
         const lines = wrapText(ctx, config.body, maxWidth);
-        const dividerY = bodyY + lines.length * 18 + 8;
+
+        // 3. Calculate dynamic card height
+        const dividerY = finalBodyY + lines.length * 18 + 8;
         const timestampY = dividerY + 16;
-        const cardH = Math.max(440, timestampY + 20 + 50); // min 440, + bottom padding
+        const cardH = Math.max(440, timestampY + 20 + 50);
 
         canvas.width = cardW * scale;
         canvas.height = cardH * scale;
-
         ctx.scale(scale, scale);
 
         // White card background
@@ -102,9 +113,9 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.drawImage(img, photoPadding, photoPadding, photoSize, photoSize);
         ctx.restore();
 
-        // Title text
+        // Title text - single line, adaptive size
         ctx.fillStyle = '#1c1917';
-        ctx.font = 'bold 20px serif';
+        ctx.font = `bold ${titleFontSize}px serif`;
         ctx.textAlign = 'center';
         ctx.fillText(config.title, cardW / 2, titleY);
 
@@ -113,7 +124,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         ctx.font = 'italic 13px sans-serif';
         ctx.textAlign = 'center';
         lines.forEach((line, i) => {
-          ctx.fillText(line, cardW / 2, bodyY + i * 18);
+          ctx.fillText(line, cardW / 2, finalBodyY + i * 18);
         });
 
         // Divider line
