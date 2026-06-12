@@ -15,39 +15,34 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
 
   const saveToPhotos = async () => {
     try {
-      // Create a canvas to composite the polaroid card
       const cardEl = document.getElementById('polaroid-card');
       if (!cardEl) return;
 
-      // Use html-to-image approach: capture the card as a blob
-      const { toBlob } = await import('html-to-image');
-      const blob = await toBlob(cardEl, {
-        quality: 0.95,
-        pixelRatio: 2,
-        backgroundColor: '#ffffff',
-      });
+      let blob: Blob | null = null;
+
+      // Method 1: Try html-to-image library
+      try {
+        const { toBlob } = await import('html-to-image');
+        blob = await toBlob(cardEl, {
+          quality: 0.95,
+          pixelRatio: 2,
+          backgroundColor: '#ffffff',
+          skipFonts: true,
+        });
+      } catch {
+        console.log('html-to-image failed, using canvas fallback');
+      }
+
+      // Method 2: Canvas fallback — manually composite the card
+      if (!blob) {
+        blob = await compositeCardWithCanvas();
+      }
 
       if (!blob) {
         throw new Error('Failed to generate image');
       }
 
-      // Try native share / download on supported platforms
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], `birthday-card-${Date.now()}.png`, { type: 'image/png' });
-        const shareData = { files: [file], title: '生日紀念賀卡' };
-        if (navigator.canShare(shareData)) {
-          try {
-            await navigator.share(shareData);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-            return;
-          } catch {
-            // Fallback to download if share fails
-          }
-        }
-      }
-
-      // Download fallback
+      // Trigger download
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -55,19 +50,112 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Delay revoke to ensure download starts
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       console.error('Save failed:', err);
-      // Fallback: open in new tab
       window.open(photo, '_blank');
     }
   };
 
+  // Canvas-based fallback compositor
+  const compositeCardWithCanvas = (): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = 2;
+        const cardW = 320;
+        const cardH = 440;
+        canvas.width = cardW * scale;
+        canvas.height = cardH * scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(null); return; }
+
+        ctx.scale(scale, scale);
+
+        // White card background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cardW, cardH);
+
+        // Photo area (square, top portion)
+        const photoPadding = 12;
+        const photoSize = cardW - photoPadding * 2;
+        ctx.save();
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(photoPadding, photoPadding, photoSize, photoSize);
+        ctx.drawImage(img, photoPadding, photoPadding, photoSize, photoSize);
+        ctx.restore();
+
+        // Title text
+        const titleY = photoPadding + photoSize + 18;
+        ctx.fillStyle = '#1c1917';
+        ctx.font = 'bold 16px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(config.title, cardW / 2, titleY);
+
+        // Body text with line wrapping
+        const bodyY = titleY + 20;
+        ctx.fillStyle = '#57534e';
+        ctx.font = 'italic 11px sans-serif';
+        ctx.textAlign = 'center';
+        const maxWidth = cardW - 30;
+        const lines = wrapText(ctx, config.body, maxWidth);
+        lines.forEach((line, i) => {
+          ctx.fillText(line, cardW / 2, bodyY + i * 16);
+        });
+
+        // Divider line
+        const dividerY = bodyY + lines.length * 16 + 8;
+        ctx.strokeStyle = '#d6d3d1';
+        ctx.beginPath();
+        ctx.moveTo(cardW / 2 - 40, dividerY);
+        ctx.lineTo(cardW / 2 + 40, dividerY);
+        ctx.stroke();
+
+        // Timestamp
+        const timestampY = dividerY + 14;
+        ctx.fillStyle = '#a8a29e';
+        ctx.font = '9px monospace';
+        ctx.fillText(config.timestamp, cardW / 2, timestampY);
+
+        canvas.toBlob((b) => resolve(b), 'image/png', 0.95);
+      };
+      img.onerror = () => resolve(null);
+      img.src = photo;
+    });
+  };
+
+  // Helper: wrap text into lines for canvas rendering
+  const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
+    // First split by explicit newlines, then word-wrap each segment
+    const paragraphs = text.split('\n');
+    const result: string[] = [];
+    paragraphs.forEach((para) => {
+      if (!para.trim()) { result.push(''); return; }
+      const words = para.split('');
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i];
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line.length > 0) {
+          result.push(line);
+          line = words[i];
+        } else {
+          line = testLine;
+        }
+      }
+      if (line) result.push(line);
+    });
+    return result;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 xs:p-4">
       {/* Dark blur backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -84,7 +172,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
         id="polaroid-card"
-        className="relative w-full max-w-[92vw] xs:max-w-sm bg-white p-3 xs:p-4 sm:p-5 pb-5 xs:pb-6 sm:pb-7 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
+        className="relative w-full max-w-[92vw] xs:max-w-sm max-h-[95vh] overflow-y-auto bg-white p-2.5 xs:p-4 sm:p-5 pb-4 xs:pb-6 sm:pb-7 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
       >
         {/* Close Button */}
         <button
@@ -115,7 +203,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
           </h3>
 
           {/* Configurable Body */}
-          <div className="max-h-[80px] xs:max-h-[100px] overflow-y-auto pr-1 text-[11px] xs:text-xs text-stone-600 font-sans italic leading-relaxed text-center scrollbar-thin mt-2.5">
+          <div className="max-h-[120px] xs:max-h-[160px] overflow-y-auto pr-1 text-[11px] xs:text-xs text-stone-600 font-sans italic leading-relaxed text-center scrollbar-thin mt-2.5 whitespace-pre-line">
             {config.body}
           </div>
 

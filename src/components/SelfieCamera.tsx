@@ -129,13 +129,13 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto glass-morphism rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
+    <div className="w-full max-w-lg mx-auto glass-morphism rounded-2xl sm:rounded-3xl p-3 xs:p-4 sm:p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
       {/* Decorative ambient lights */}
       <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-gold-400 opacity-10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-pink-500 opacity-10 blur-3xl pointer-events-none" />
 
       {/* Camera Preview Box */}
-      <div className="w-full aspect-[4/3] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
+      <div className="w-full aspect-[4/3] max-h-[42vh] xs:max-h-[48vh] sm:max-h-none bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
         {/* Loading spinner */}
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20 space-y-3">
@@ -161,7 +161,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center">
             <Camera className="w-12 h-12 sm:w-14 sm:h-14 text-gold-300/30 mb-3 sm:mb-4" />
             <p className="text-sm sm:text-base text-gold-200/70 leading-relaxed max-w-[280px] font-sans">
-              請影低「即影即有相片」，或其它生日紀念相
+              請影低「即影即有相片」，<br />或其它生日紀念相
             </p>
           </div>
         )}

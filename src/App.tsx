@@ -154,15 +154,15 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-4 xs:py-6 sm:py-10 z-20"
+            className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-4 xs:py-6 sm:py-10 z-20 min-h-screen"
           >
-            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-4 xs:mb-5 sm:mb-8">
+            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-2 xs:mb-3 sm:mb-5 flex-shrink-0">
               <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
-                生日專屬紀念賀卡
+                Happy Birthday!
               </h1>
             </div>
 
-            <div className="w-full max-w-[95vw] xs:max-w-sm sm:max-w-lg px-1">
+            <div className="w-full max-w-[95vw] xs:max-w-sm sm:max-w-lg px-1 flex-shrink-0">
               <SelfieCamera onCapture={handleCapturePhoto} />
             </div>
           </motion.div>
@@ -213,7 +213,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
-            className="absolute inset-0 flex flex-col justify-between p-3 xs:p-4 sm:p-6 z-10 pointer-events-none"
+            className="absolute inset-0 flex flex-col justify-between p-3 xs:p-4 sm:p-6 z-10 pointer-events-none overflow-y-auto"
           >
             {/* Back button - top right */}
             <div className="absolute top-4 xs:top-5 right-4 xs:right-5 sm:right-6 pointer-events-auto z-20">
@@ -227,25 +227,25 @@ export default function App() {
             </div>
 
             {/* Top Glowing Title text */}
-            <div className="w-full text-center pt-[10vh] xs:pt-[12vh] sm:pt-20 md:pt-24">
+            <div className="w-full text-center pt-[8vh] xs:pt-[10vh] sm:pt-16 md:pt-20">
               <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, type: "spring" }}
-                className="space-y-2 xs:space-y-3 sm:space-y-4 px-2 xs:px-3 sm:px-4"
+                className="space-y-1.5 xs:space-y-2 sm:space-y-3 px-2 xs:px-3 sm:px-4"
               >
-                <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
+                <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
                   願主賜恩典於你！
                 </h1>
 
-                <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-300/90 max-w-[90vw] xs:max-w-xs sm:max-w-md mx-auto font-sans leading-relaxed pt-1 sm:pt-2 px-2">
+                <p className="text-[13px] xs:text-sm sm:text-base md:text-lg text-gray-300/90 max-w-[90vw] xs:max-w-xs sm:max-w-md mx-auto font-sans leading-relaxed pt-1 sm:pt-2 px-2">
                   在新的一歲裡，恩典滿滿，每日都有與主同行的美好~
                 </p>
               </motion.div>
             </div>
 
             {/* Bottom floating button overlay */}
-            <div className="w-full pb-4 xs:pb-6 sm:pb-10 flex flex-col items-center pointer-events-auto">
+            <div className="w-full pb-3 xs:pb-5 sm:pb-8 flex flex-col items-center pointer-events-auto flex-shrink-0">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
