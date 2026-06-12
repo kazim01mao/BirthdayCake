@@ -672,7 +672,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
 
       {/* Interactive Overlay Container for Step 2 - Responsive full-width */}
       {step === 2 && (
-        <div className="absolute bottom-3 xs:bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 w-[92vw] xs:w-[88vw] sm:max-w-sm px-2 xs:px-3 sm:px-4 z-20 pointer-events-auto">
+        <div className="absolute bottom-16 xs:bottom-20 sm:bottom-24 left-1/2 -translate-x-1/2 w-[92vw] xs:w-[88vw] sm:max-w-sm px-2 xs:px-3 sm:px-4 z-20 pointer-events-auto">
           <div className="glass-morphism rounded-xl xs:rounded-2xl p-2.5 xs:p-3 sm:p-4 shadow-xl border border-gold-300/10 flex flex-col items-center">
             <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-300 text-center leading-relaxed font-sans max-w-[260px] xs:max-w-[280px] mb-2 xs:mb-3">
               手指拖動屏幕中央蛋糕可旋轉。雙指夾捏進行縮放。點擊下方按鈕，一起享用蛋糕吧！
@@ -681,7 +681,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             <div className="w-full pt-2 xs:pt-3 border-t border-white/5 flex flex-col justify-center items-center">
               <button
                 onClick={forceBlowEvent}
-                className="w-full py-2 xs:py-2.5 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.1em] xs:tracking-[0.12em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center justify-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300 active:scale-95"
+                className="w-full py-2.5 xs:py-3 sm:py-3.5 bg-gold-400/20 border border-gold-300/70 text-gold-100 hover:bg-gold-400/35 hover:border-gold-300 hover:text-white font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.1em] xs:tracking-[0.12em] uppercase rounded-full shadow-[0_0_25px_rgba(212,171,89,0.3)] hover:shadow-[0_0_35px_rgba(212,171,89,0.5)] flex items-center justify-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300 active:scale-95"
               >
                 <Wind className="w-3.5 h-3.5 xs:w-4 xs:h-4 flex-shrink-0" />
                 <span>宜家開始享用蛋糕啦</span>
