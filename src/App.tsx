@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import PolaroidCard from './components/PolaroidCard';
 import ParticleCakeScene from './components/ParticleCakeScene';
-import { Sparkles, Heart, Gift, Volume2, VolumeX, ArrowRight, Camera, HelpCircle, MailOpen } from 'lucide-react';
+import { Sparkles, Heart, Gift, Volume2, VolumeX, ArrowRight, Camera, HelpCircle, MailOpen, ArrowLeft } from 'lucide-react';
 import SelfieCamera from './components/SelfieCamera';
+import { getCardConfig } from './cardConfig';
 
 export default function App() {
   const [step, setStep] = useState<number>(1);
@@ -153,25 +154,17 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-0 flex flex-col justify-center items-center px-3 sm:px-4 overflow-y-auto py-6 sm:py-10 z-20"
+            className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-4 xs:py-6 sm:py-10 z-20"
           >
-            {/* Elegant Background ambient decorations */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 sm:w-96 md:w-[500px] h-64 sm:h-96 md:h-[500px] rounded-full bg-gold-400/5 blur-3xl pointer-events-none" />
-
-            <div className="text-center max-w-md mb-6 sm:mb-8">
-              <div className="text-[9px] sm:text-[10px] font-mono text-gold-300 tracking-[0.3em] uppercase mb-1">
-                MEMOIR ENGINE · EST 2026
-              </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif tracking-wide text-transparent bg-gradient-to-b from-white via-gold-100 to-gold-300 bg-clip-text font-bold mb-3 sm:mb-4 drop-shadow-xl select-text leading-tight uppercase">
-                璀璨星河生日 केक
+            <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-4 xs:mb-5 sm:mb-8">
+              <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
+                生日專屬紀念賀卡
               </h1>
-              <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed max-w-xs mx-auto text-center font-sans mt-2 sm:mt-3">
-                一場融合 3D WebGL、環境感應、與煙火效果的頂奢生日驚喜。
-              </p>
             </div>
 
-            {/* Selfie component with built-in camera request and fallbacks */}
-            <SelfieCamera onCapture={handleCapturePhoto} />
+            <div className="w-full max-w-[95vw] xs:max-w-sm sm:max-w-lg px-1">
+              <SelfieCamera onCapture={handleCapturePhoto} />
+            </div>
           </motion.div>
         )}
 
@@ -183,27 +176,31 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.0 }}
-            className="absolute inset-0 pointer-events-none z-10"
+            className="absolute inset-0 pointer-events-none z-10 flex items-start justify-center pt-[5vh] sm:pt-[6vh]"
           >
             {/* Ambient Screen Header overlay */}
-            <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full text-center px-6">
+            <div className="w-full text-center px-4 sm:px-6">
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
-                className="inline-flex flex-col items-center gap-1.5"
+                className="inline-flex flex-col items-center"
               >
-                <div className="px-3 py-1 bg-gold-400/5 border border-gold-300/20 rounded-full flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-cyan-neon rounded-full animate-ping" />
-                  <span className="text-[9px] font-mono tracking-widest text-cyan-neon uppercase">3D RENDER ENGINE</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-serif text-white/95 mt-1 tracking-wider uppercase">
-                  法式金粉粒子蛋糕
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gold-200 font-bold tracking-wide drop-shadow-xl">
+                  生日快樂，平安喜樂！
                 </h2>
-                <div className="text-[10px] font-mono tracking-[0.25em] text-gold-300/85 uppercase">
-                  WISHING YOU A RADIANT YEAR AHEAD
-                </div>
               </motion.div>
+            </div>
+
+            {/* Back button - top right */}
+            <div className="absolute top-4 xs:top-5 right-4 xs:right-5 sm:right-6 pointer-events-auto z-20">
+              <button
+                onClick={handleReset}
+                className="flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gold-200/60 hover:text-gold-200 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+                aria-label="返回"
+              >
+                <ArrowLeft className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5" />
+              </button>
             </div>
           </motion.div>
         )}
@@ -216,37 +213,39 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2 }}
-            className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6 z-10 pointer-events-none"
+            className="absolute inset-0 flex flex-col justify-between p-3 xs:p-4 sm:p-6 z-10 pointer-events-none"
           >
+            {/* Back button - top right */}
+            <div className="absolute top-4 xs:top-5 right-4 xs:right-5 sm:right-6 pointer-events-auto z-20">
+              <button
+                onClick={() => { setIsCardOpen(false); setStep(2); }}
+                className="flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gold-200/60 hover:text-gold-200 transition-all duration-300 cursor-pointer backdrop-blur-sm"
+                aria-label="返回"
+              >
+                <ArrowLeft className="w-4 h-4 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5" />
+              </button>
+            </div>
+
             {/* Top Glowing Title text */}
-            <div className="w-full text-center pt-16 sm:pt-20 md:pt-24">
+            <div className="w-full text-center pt-[10vh] xs:pt-[12vh] sm:pt-20 md:pt-24">
               <motion.div
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, type: "spring" }}
-                className="space-y-2 sm:space-y-3 md:space-y-4 px-3 sm:px-4"
+                className="space-y-2 xs:space-y-3 sm:space-y-4 px-2 xs:px-3 sm:px-4"
               >
-                <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-[8px] sm:text-[10px] font-mono tracking-widest text-pink-300 uppercase whitespace-nowrap">
-                  <Gift className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-pink-400 flex-shrink-0" />
-                  <span>儀式吹熄成功</span>
-                </div>
-
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif text-white tracking-tight font-bold neon-glow-text select-text py-1 sm:py-2 leading-tight">
-                  Happy Birthday<br className="sm:hidden" /> {name}!
+                <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-gold-200 tracking-wide font-bold drop-shadow-xl select-text py-1 sm:py-2 leading-tight px-1">
+                  願主賜恩典於你！
                 </h1>
-                
-                <div className="text-[8px] sm:text-[10px] font-mono tracking-[0.25em] text-gold-300 uppercase whitespace-normal sm:whitespace-nowrap">
-                  WISHING YOU A RADIANT YEAR AHEAD
-                </div>
 
-                <p className="text-[10px] sm:text-xs text-gray-300 max-w-sm mx-auto font-sans leading-relaxed pt-1 sm:pt-2">
-                  ✨ 燭光已逝，星河漫天。祝願你的生活璀璨閃耀。
+                <p className="text-sm xs:text-base sm:text-lg md:text-xl text-gray-300/90 max-w-[90vw] xs:max-w-xs sm:max-w-md mx-auto font-sans leading-relaxed pt-1 sm:pt-2 px-2">
+                  在新的一歲裡，恩典滿滿，每日都有與主同行的美好~
                 </p>
               </motion.div>
             </div>
 
             {/* Bottom floating button overlay */}
-            <div className="w-full pb-6 sm:pb-10 flex flex-col items-center pointer-events-auto">
+            <div className="w-full pb-4 xs:pb-6 sm:pb-10 flex flex-col items-center pointer-events-auto">
               <motion.button
                 id="btn-open-birthday-card"
                 onClick={() => setIsCardOpen(true)}
@@ -255,9 +254,9 @@ export default function App() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-                className="py-3 sm:py-4 px-6 sm:px-10 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-xs sm:text-sm tracking-[0.18em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-2 cursor-pointer transition-all duration-300"
+                className="py-2.5 xs:py-3 sm:py-4 px-5 xs:px-6 sm:px-10 bg-transparent border border-gold-300 text-gold-300 hover:bg-gold-400/10 hover:text-gold-200 font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.18em] uppercase rounded-full shadow-[0_0_20px_rgba(212,171,89,0.15)] flex items-center gap-1.5 xs:gap-2 cursor-pointer transition-all duration-300"
               >
-                <MailOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-300 flex-shrink-0" />
+                <MailOpen className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 text-gold-300 flex-shrink-0" />
                 <span className="whitespace-nowrap">打開生日賀卡</span>
               </motion.button>
             </div>
@@ -271,8 +270,7 @@ export default function App() {
         {isCardOpen && photo && (
           <PolaroidCard
             photo={photo}
-            name={name}
-            blessing={blessing}
+            config={getCardConfig(name)}
             onClose={() => setIsCardOpen(false)}
             onReset={handleReset}
           />
