@@ -52,8 +52,8 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
       const constraints = {
         video: {
           facingMode: { ideal: mode },
-          width: { ideal: 640 },
-          height: { ideal: 480 }
+          width: { ideal: 480 },
+          height: { ideal: 640 }
         },
         audio: false
       };
@@ -135,7 +135,7 @@ export default function SelfieCamera({ onCapture }: SelfieCameraProps) {
       <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-pink-500 opacity-10 blur-3xl pointer-events-none" />
 
       {/* Camera Preview Box */}
-      <div className="w-full aspect-[4/3] max-h-[32vh] sm:max-h-[45vh] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
+      <div className="w-full max-w-[75vw] xs:max-w-[65vw] sm:max-w-[280px] mx-auto aspect-[3/4] max-h-[55vh] sm:max-h-[65vh] bg-black/40 rounded-xl sm:rounded-2xl border border-gold-300/10 overflow-hidden relative shadow-inner">
         {/* Loading spinner */}
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-20 space-y-3">
