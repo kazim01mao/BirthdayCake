@@ -76,14 +76,14 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         // Pre-calculate text layout to determine dynamic card height
         const photoPadding = 12;
         const photoSize = cardW - photoPadding * 2;
-        const titleY = photoPadding + photoSize + 18;
-        const bodyY = titleY + 20;
+        const titleY = photoPadding + photoSize + 22;
+        const bodyY = titleY + 24;
         const maxWidth = cardW - 30;
 
-        ctx.font = 'italic 11px sans-serif';
+        ctx.font = 'italic 13px sans-serif';
         const lines = wrapText(ctx, config.body, maxWidth);
-        const dividerY = bodyY + lines.length * 16 + 8;
-        const timestampY = dividerY + 14;
+        const dividerY = bodyY + lines.length * 18 + 8;
+        const timestampY = dividerY + 16;
         const cardH = Math.max(440, timestampY + 20 + 50); // min 440, + bottom padding
 
         canvas.width = cardW * scale;
@@ -104,16 +104,16 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
 
         // Title text
         ctx.fillStyle = '#1c1917';
-        ctx.font = 'bold 16px serif';
+        ctx.font = 'bold 20px serif';
         ctx.textAlign = 'center';
         ctx.fillText(config.title, cardW / 2, titleY);
 
         // Body text with line wrapping
         ctx.fillStyle = '#57534e';
-        ctx.font = 'italic 11px sans-serif';
+        ctx.font = 'italic 13px sans-serif';
         ctx.textAlign = 'center';
         lines.forEach((line, i) => {
-          ctx.fillText(line, cardW / 2, bodyY + i * 16);
+          ctx.fillText(line, cardW / 2, bodyY + i * 18);
         });
 
         // Divider line
@@ -125,7 +125,7 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
 
         // Timestamp
         ctx.fillStyle = '#a8a29e';
-        ctx.font = '9px monospace';
+        ctx.font = '10px monospace';
         ctx.fillText(config.timestamp, cardW / 2, timestampY);
 
         canvas.toBlob((b) => resolve(b), 'image/png', 0.95);
@@ -170,87 +170,91 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         className="absolute inset-0 bg-black/85 backdrop-blur-md cursor-pointer"
       />
 
-      {/* Polaroid Container */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 30, rotate: -2 }}
-        animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 0 }}
-        transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        id="polaroid-card"
-        className="relative w-full max-w-[90vw] xs:max-w-xs max-h-[98vh] overflow-y-auto bg-white p-3 sm:p-4 pb-3 sm:pb-5 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
-      >
-        {/* Back Button - top right */}
-        <button
-          onClick={onClose}
-          className="absolute top-1.5 right-1.5 flex items-center justify-center w-6 h-6 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100/60 transition-all duration-200 cursor-pointer"
-          aria-label="返回"
+      <div className="relative flex flex-col items-center max-h-[98vh] w-full max-w-[90vw] xs:max-w-xs">
+        {/* Polaroid Card - pure white card for snapshot */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 30, rotate: -2 }}
+          animate={{ opacity: 1, scale: 1, y: 0, rotate: 1 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20, rotate: 0 }}
+          transition={{ type: "spring", damping: 25, stiffness: 120 }}
+          id="polaroid-card"
+          className="relative w-full overflow-hidden bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-sm shadow-[0_30px_70px_rgba(0,0,0,0.8)] border border-stone-200 flex flex-col items-center select-none z-10"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-        </button>
-
-        {/* Return Button - top left */}
-        <button
-          onClick={onReset}
-          className="absolute top-1.5 left-1.5 flex items-center gap-0.5 text-stone-400 hover:text-stone-700 py-1 pl-1 pr-2 rounded-full transition-colors cursor-pointer bg-stone-100/50 hover:bg-stone-200/70"
-          aria-label="返回重新拍攝"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="text-[10px] font-sans font-medium">返回重拍</span>
-        </button>
-
-        {/* Photo Container with subtle shadow and border */}
-        <div className="w-full aspect-square bg-stone-950 overflow-hidden shadow-[inset_0_2px_8px_rgba(0,0,0,0.6)] flex items-center justify-center relative">
-          <img
-            src={photo}
-            alt="Birthday Memory"
-            className="w-full h-full object-cover polaroid-sepia transition-all duration-700"
-            referrerPolicy="no-referrer"
-            crossOrigin="anonymous"
-          />
-          {/* Polaroid flash glossy look */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
-        </div>
-
-        {/* Text Area */}
-        <div className="w-full mt-4 text-center text-stone-800 px-1 flex flex-col items-center">
-          {/* Configurable Title */}
-          <h3 className="font-serif text-base xs:text-lg sm:text-xl tracking-wide font-bold text-stone-900">
-            {config.title}
-          </h3>
-
-           {/* Configurable Body */}
-           <div className="pr-1 text-[10px] xs:text-[11px] sm:text-xs text-stone-600 font-sans italic leading-relaxed text-center mt-1.5 whitespace-pre-line">
-            {config.body}
+          {/* Photo Container with subtle shadow and border */}
+          <div className="w-full aspect-square bg-stone-950 overflow-hidden shadow-[inset_0_2px_8px_rgba(0,0,0,0.6)] flex items-center justify-center relative">
+            <img
+              src={photo}
+              alt="Birthday Memory"
+              className="w-full h-full object-cover polaroid-sepia transition-all duration-700"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
+            />
+            {/* Polaroid flash glossy look */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
           </div>
 
-          <div className="w-24 h-[1px] bg-stone-200 my-2" />
+          {/* Text Area */}
+          <div className="w-full mt-5 sm:mt-6 text-center text-stone-800 px-1 flex flex-col items-center">
+            {/* Configurable Title */}
+            <h3 className="font-serif text-lg xs:text-xl sm:text-2xl tracking-wide font-bold text-stone-900 leading-snug">
+              {config.title}
+            </h3>
 
-          {/* Configurable Timestamp */}
-          <p className="font-mono text-[8px] text-stone-400 tracking-widest uppercase">
-            {config.timestamp}
-          </p>
-        </div>
+            {/* Configurable Body */}
+            <div className="pr-1 text-xs xs:text-sm sm:text-base text-stone-600 font-sans italic leading-relaxed text-center mt-2 sm:mt-3 whitespace-pre-line">
+              {config.body}
+            </div>
 
-        {/* Control Button - Save to local photos */}
-        <div className="w-full mt-5">
+            <div className="w-24 h-[1px] bg-stone-200 my-2.5 sm:my-3" />
+
+            {/* Configurable Timestamp */}
+            <p className="font-mono text-[9px] sm:text-[10px] text-stone-400 tracking-widest uppercase">
+              {config.timestamp}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Buttons outside the card - not included in snapshot */}
+        <div className="w-full flex flex-col gap-2 mt-3 sm:mt-4 z-10">
+          {/* Save Button */}
           <button
             onClick={saveToPhotos}
-            className="w-full flex items-center justify-center gap-2 py-2 sm:py-2.5 px-4 bg-stone-900 hover:bg-black text-white rounded-lg text-[11px] xs:text-xs sm:text-sm font-sans tracking-wide transition-all duration-200 active:scale-95 cursor-pointer border border-stone-800"
+            className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 bg-stone-900 hover:bg-black text-white rounded-lg text-xs sm:text-sm font-sans tracking-wide transition-all duration-200 active:scale-95 cursor-pointer border border-stone-800"
           >
             {saved ? (
               <>
-                <Check className="w-4 h-4 xs:w-5 xs:h-5 text-emerald-400 flex-shrink-0" />
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0" />
                 <span>已儲存</span>
               </>
             ) : (
               <>
-                <Download className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0" />
+                <Download className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span>存儲至本地相簿</span>
               </>
             )}
           </button>
+
+          {/* Close & Return Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg text-[10px] sm:text-xs transition-all duration-200 cursor-pointer border border-white/10"
+              aria-label="返回"
+            >
+              <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+              <span>返回</span>
+            </button>
+            <button
+              onClick={onReset}
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg text-[10px] sm:text-xs transition-all duration-200 cursor-pointer border border-white/10"
+              aria-label="返回重新拍攝"
+            >
+              <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+              <span>返回重拍</span>
+            </button>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
