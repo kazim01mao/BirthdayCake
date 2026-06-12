@@ -157,8 +157,8 @@ export default function App() {
             className="absolute inset-0 flex flex-col justify-center items-center px-2 xs:px-3 sm:px-4 overflow-y-auto py-3 sm:py-8 z-20 min-h-screen"
           >
             <div className="text-center max-w-[90vw] xs:max-w-sm sm:max-w-md mb-3 sm:mb-5 flex-shrink-0">
-              <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
-                Happy Birthday!
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif tracking-wide text-gold-200 font-bold drop-shadow-xl select-text leading-tight py-1">
+                {getCardConfig(name).step1Title}
               </h1>
             </div>
 
