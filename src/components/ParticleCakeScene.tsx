@@ -681,7 +681,7 @@ export default function ParticleCakeScene({ step, isExtinguished, onBlowTriggere
             <div className="w-full pt-2 xs:pt-3 border-t border-white/5 flex flex-col justify-center items-center">
               <button
                 onClick={forceBlowEvent}
-                className="w-full py-2.5 xs:py-3 sm:py-3.5 bg-gold-400/20 border border-gold-300/70 text-gold-100 hover:bg-gold-400/35 hover:border-gold-300 hover:text-white font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.1em] xs:tracking-[0.12em] uppercase rounded-full shadow-[0_0_25px_rgba(212,171,89,0.3)] hover:shadow-[0_0_35px_rgba(212,171,89,0.5)] flex items-center justify-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300 active:scale-95"
+                className="w-full py-2.5 xs:py-3 sm:py-3.5 bg-gradient-to-r from-gold-400/60 via-gold-300/50 to-gold-400/60 border-2 border-gold-300/80 text-white hover:from-gold-400/80 hover:via-gold-300/70 hover:to-gold-400/80 hover:border-gold-200 hover:shadow-[0_0_40px_rgba(212,171,89,0.6)] font-serif font-bold text-[11px] xs:text-xs sm:text-sm tracking-[0.1em] xs:tracking-[0.12em] uppercase rounded-full shadow-[0_0_30px_rgba(212,171,89,0.5)] flex items-center justify-center gap-1 xs:gap-1.5 cursor-pointer transition-all duration-300 active:scale-95"
               >
                 <Wind className="w-3.5 h-3.5 xs:w-4 xs:h-4 flex-shrink-0" />
                 <span>宜家開始享用蛋糕啦</span>
