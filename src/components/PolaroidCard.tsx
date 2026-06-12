@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Download, X, Check } from 'lucide-react';
+import { Download, X, Check, ArrowLeft } from 'lucide-react';
 import { CardConfig } from '../cardConfig';
 
 interface PolaroidCardProps {
@@ -177,9 +177,20 @@ export default function PolaroidCard({ photo, config, onClose, onReset }: Polaro
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-stone-400 hover:text-stone-850 p-1.5 rounded-full transition-colors cursor-pointer"
+          className="absolute top-2 right-2 text-stone-400 hover:text-stone-700 p-1.5 rounded-full transition-colors cursor-pointer"
+          aria-label="返回"
         >
           <X className="w-5 h-5" />
+        </button>
+
+        {/* Return Button - top left */}
+        <button
+          onClick={onReset}
+          className="absolute top-2 left-2 flex items-center gap-1 text-stone-400 hover:text-stone-700 py-1.5 pl-1.5 pr-2.5 rounded-full transition-colors cursor-pointer bg-stone-100/50 hover:bg-stone-200/70"
+          aria-label="返回重新拍攝"
+        >
+          <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+          <span className="text-[11px] font-sans font-medium">返回重拍</span>
         </button>
 
         {/* Photo Container with subtle shadow and border */}
